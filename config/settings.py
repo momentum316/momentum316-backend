@@ -195,11 +195,6 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        "APP": {
-            "client_id": env("GOOGLE_CLIENT_ID"),
-            "secret": env("GOOGLE_SECRET_KEY"),
-            "key": "",
-        },
         'SCOPE': [
             'profile',
             'email',
