@@ -155,11 +155,11 @@ AUTH_USER_MODEL = 'congregate.User'
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-if env("RENDER"):
-    ALLOWED_HOSTS.append(env("RENDER_EXTERNAL_HOSTNAME"))
-    DJANGO_SUPERUSER_USERNAME = env("DJANGO_SUPERUSER_USERNAME")
-    DJANGO_SUPERUSER_PASSWORD = env("DJANGO_SUPERUSER_PASSWORD")
-    DJANGO_SUPERUSER_EMAIL = env("DJANGO_SUPERUSER_EMAIL")
+if env('RENDER'):
+    ALLOWED_HOSTS.append(env('RENDER_EXTERNAL_HOSTNAME'))
+    DJANGO_SUPERUSER_USERNAME = env('DJANGO_SUPERUSER_USERNAME')
+    DJANGO_SUPERUSER_PASSWORD = env('DJANGO_SUPERUSER_PASSWORD')
+    DJANGO_SUPERUSER_EMAIL = env('DJANGO_SUPERUSER_EMAIL')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -195,6 +195,11 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
+        'APP': {
+            'client_id': env('GOOGLE_CLIENT_ID'),
+            'secret': env('GOOGLE_SECRET_KEY'),
+            'key': '',
+        },
         'SCOPE': [
             'profile',
             'email',
