@@ -1,11 +1,11 @@
 from rest_framework.serializers import ModelSerializer
-from .models import User, Group, Event, EventOption
+from .models import CongregateUser, Group, Event, EventOption
 
 
-class UserSerializer(ModelSerializer):
+class CongregateUserSerializer(ModelSerializer):
 
     class Meta:
-        model = User
+        model = CongregateUser
         fields = (
             'id',
             'username',
@@ -14,3 +14,18 @@ class UserSerializer(ModelSerializer):
             'email',
             'avatar',
         )
+
+
+class GroupSerializer(ModelSerializer):
+    model = Group
+    fields = '__all__'
+
+
+class EventSerializer(ModelSerializer):
+    model = Event
+    fields = '__all__'
+
+
+class EventOptionSerializer(ModelSerializer):
+    model = EventOption
+    fields = '__all__'

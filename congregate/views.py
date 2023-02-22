@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
-from .models import User
+from .models import CongregateUser
 # Group, Event, EventOption
-from .serializers import UserSerializer
-# GroupSerializer, EventSerializer, EventOptionSerializer
+from .serializers import CongregateUserSerializer
+# EventSerializer, EventOptionSerializer
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 # ListCreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView
 
@@ -23,8 +23,14 @@ class GoogleLogin(SocialLoginView):
 
 
 class UserHome(RetrieveUpdateDestroyAPIView):
-    serializer_class = UserSerializer
+    queryset = CongregateUser.objects.all()
+    serializer_class = CongregateUserSerializer
+    lookup_url_kwarg = 'username'
+    lookup_field = 'username'
 
-    def get_queryset(self):
-        queryset = User.objects.filter(username=self.request.user)
-        return queryset
+
+# class GroupHome(RetrieveUpdateDestroyAPIView):
+#     serializer_class = GroupSerializer
+
+#     def get_queryset(self):
+#         return 
