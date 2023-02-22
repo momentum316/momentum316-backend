@@ -212,7 +212,8 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'offline',
-        }
+        },
+        'OAUTH_PKCE_ENABLED': True,
     }
 }
 

@@ -12,5 +12,5 @@ def testview(request):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = 'http://localhost:8000/accounts/google/login/callback/'
+    callback_url = 'http://localhost:3000/callback/'
     client_class = OAuth2Client
