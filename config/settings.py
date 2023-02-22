@@ -217,6 +217,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+DEFAULT_FROM_EMAIL = 'momentumlearn316@gmail.com'
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
