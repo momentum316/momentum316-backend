@@ -65,8 +65,8 @@ class Event(models.Model):
     title = models.CharField(max_length=255)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='events')
     voting = models.BooleanField(default=False)
-    start_time = models.DateTimeField()
-    vote_closing_time = models.DateTimeField()
+    start_time = models.DateTimeField(auto_now_add=True)
+    vote_closing_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
