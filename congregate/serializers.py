@@ -3,11 +3,28 @@ from rest_framework.serializers import ModelSerializer
 from .models import CongregateUser, Group, Event, Activity
 
 
+class ActivitySerializer(ModelSerializer):
+
+    class Meta:
+        model = Activity
+        fields = '__all__'
+
+
 class EventSerializer(ModelSerializer):
+    group = serializers.SlugRelatedField(slug_field='title', read_only=True)
+    activity_list = ActivitySerializer(many=True, source='options', read_only=True)
 
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = (
+            'id',
+            'title',
+            'group',
+            'voting',
+            'start_time',
+            'vote_closing_time',
+            'activity_list',
+        )
 
 
 class GroupSerializer(ModelSerializer):
@@ -42,8 +59,3 @@ class CongregateUserSerializer(ModelSerializer):
         )
 
 
-class ActivitySerializer(ModelSerializer):
-
-    class Meta:
-        model = Activity
-        fields = '__all__'
