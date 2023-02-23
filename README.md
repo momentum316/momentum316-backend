@@ -250,7 +250,7 @@ POST /add-user-group/
 
 ### request
 
-Event title and group_id are required
+Requires event title, group_id, voting (T/F), date, and vote_closing_time
 
 ```txt
 POST /new/event
@@ -259,7 +259,10 @@ POST /new/event
 ```json
 {
   "title": "Girls' Night Out!!",
-  "group_id": 1
+  "group_id": 1,
+  "voting": true,
+  "date": "2023-02-24",
+  "vote_closing_time": "2023-02-24T20:02:13.000Z"
 }
 ```
 
@@ -313,7 +316,7 @@ GET /event/<event_id>
 
 ### request
 
-Requires title, event_id, and description
+Requires title, event_id, start_time, end_time, and description
 
 ```txt
 POST /new/activity/
