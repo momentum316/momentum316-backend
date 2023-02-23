@@ -250,7 +250,7 @@ POST /add-user-group/
 
 ### request
 
-Event title and group_id are required
+Requires event title, group_id, voting (T/F), date, and vote_closing_time
 
 ```txt
 POST /new/event
@@ -259,7 +259,10 @@ POST /new/event
 ```json
 {
   "title": "Girls' Night Out!!",
-  "group_id": 1
+  "group_id": 1,
+  "voting": true,
+  "date": "2023-02-24",
+  "vote_closing_time": "2023-02-25T20:02:13.000Z"
 }
 ```
 
@@ -269,17 +272,13 @@ POST /new/event
 200 OK
 
 {
-	"id": 1,
-	"title": "Party Group",
-	"members": [
-		"jcox",
-		"bjenkins",
-		"congreg8",
-		"testuser",
-		"testuser1",
-		"justcapel"
-	],
-	"admin": "jcox"
+	"event": {
+		"id": 1,
+		"title": "Girls' Night Out!!",
+		"voting": true,
+		"date": "2023-02-24",
+		"vote_closing_time": "2023-02-25T20:02:13.000Z"
+	}
 }
 ```
 
@@ -313,18 +312,32 @@ GET /event/<event_id>
 
 ### request
 
-Requires title, event_id, and description
+Requires title, event_id, start_time, end_time, and description
 
 ```txt
 POST /new/activity/
+```
+
+```json
+{
+  "title": "Left-handed bowling night",
+  "event_id": 1,
+  "description": "You must use your left hand to bowl!",
+  "start_time": "2023-02-24T06:14:53.955425Z",
+  "end_time": "2023-02-24T09:14:53.955425Z"
+}
 ```
 
 ### response
 
 ```json
 {
-  "title": "Fun activity!",
-  "event_id": 1,
-  "description": "We'll have so much fun!"
+  "activity": {
+    "id": 3,
+    "title": "Left-handed bowling night",
+    "description": "You must use your left hand to bowl!",
+    "start_time": "2023-02-24T06:14:53.955425Z",
+    "end_time": "2023-02-24T09:14:53.955425Z"
+  }
 }
 ```

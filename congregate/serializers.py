@@ -12,18 +12,19 @@ class ActivitySerializer(ModelSerializer):
 
 class EventSerializer(ModelSerializer):
     group = serializers.SlugRelatedField(slug_field='title', read_only=True)
-    activity_list = ActivitySerializer(many=True, source='options', read_only=True)
+    activity_list = ActivitySerializer(many=True, source='activities', read_only=True)
 
     class Meta:
         model = Event
         fields = (
             'id',
             'title',
-            'group',
             'voting',
-            'start_time',
-            'vote_closing_time',
+            'winning_activity'
+            'date',
             'activity_list',
+            'group',
+            'vote_closing_time',
         )
 
 
@@ -57,5 +58,3 @@ class CongregateUserSerializer(ModelSerializer):
             'avatar',
             'group_list',
         )
-
-
