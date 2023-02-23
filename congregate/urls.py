@@ -9,9 +9,8 @@ urlpatterns = [
     path('<slug:username>/groups/', views.UserGroup.as_view(), name='user_groups'),
     path('group/<int:group_id>', views.GroupHome.as_view(), name='group_home'),
     path('new/event/', views.new_event, name='add_event'),
+    path('add-user-group/', views.add_user_group, name='add_user_group'),
 ]
-
-# path('<slug:username>/events/', views.UserEvents.as_view(), name='user_events'),
 
 # /new/event
 # /new/option

@@ -3,20 +3,6 @@ from rest_framework.serializers import ModelSerializer
 from .models import CongregateUser, Group, Event, EventOption
 
 
-class CongregateUserSerializer(ModelSerializer):
-
-    class Meta:
-        model = CongregateUser
-        fields = (
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'avatar',
-        )
-
-
 class EventSerializer(ModelSerializer):
 
     class Meta:
@@ -37,6 +23,22 @@ class GroupSerializer(ModelSerializer):
             'members',
             'admin',
             'event_list',
+        )
+
+
+class CongregateUserSerializer(ModelSerializer):
+    group_list = GroupSerializer(many=True, source='user_groups', read_only=True)
+
+    class Meta:
+        model = CongregateUser
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'avatar',
+            'group_list',
         )
 
 
