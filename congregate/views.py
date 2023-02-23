@@ -72,14 +72,17 @@ class UserGroup(ListCreateAPIView):
         return user.user_groups.all()
 
     def create(self, request):
+        user = get_object_or_404(CongregateUser, username=self.kwargs['username'])
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return redirect(f'/{user.username}/groups/', status=201)
 
 
-# class GroupHome(RetrieveUpdateDestroyAPIView):
-#     serializer_class = GroupSerializer
+class GroupHome(RetrieveUpdateDestroyAPIView):
+    serializer_class = GroupSerializer
+    lookup_url_kwarg = 'group_id'
 
-#     def get_queryset(self):
-#         return
+    def get_queryset(self):
+        queryset = Group.objects.filter(id=self.kwargs['group_id'])
+        return queryset
