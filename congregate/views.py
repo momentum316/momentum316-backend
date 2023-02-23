@@ -98,13 +98,16 @@ def new_event(request):
         data = json.loads(request.body)
         title = data.get('title', None)
         group_id = data.get('group_id', None)
+        voting = data.get('voting', None)
+        date = data.get('date', None)
+        vote_closing_time = data.get('vote_closing_time', None)
 
         # Create and save the new event
         group = Group.objects.get(id=group_id)
-        event = Event.objects.create(title=title, group=group)
+        event = Event.objects.create(title=title, group=group, voting=voting, date=date, vote_closing_time=vote_closing_time)
         event.save()
 
-        return redirect(f'/group/{group_id}', status=201)
+        return JsonResponse({'event': {'id': event.id, 'title': event.title, 'voting': event.voting, 'date': event.date, 'vote_closing_time': event.vote_closing_time}}, status=201)
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
@@ -141,13 +144,15 @@ def new_activity(request):
         title = data.get('title', None)
         event_id = data.get('event_id', None)
         description = data.get('description', None)
+        start_time = data.get('start_time', None)
+        end_time = data.get('end_time', None)
 
         # Create and save the new event
         event = Event.objects.get(id=event_id)
-        activity = Activity.objects.create(title=title, event=event, description=description)
+        activity = Activity.objects.create(title=title, event=event, description=description, start_time=start_time, end_time=end_time)
         activity.save()
 
-        return JsonResponse({'activity': {'id': activity.id, 'title': activity.title}}, status=201)
+        return JsonResponse({'activity': {'id': activity.id, 'title': activity.title, 'description': activity.description, 'start_time': activity.start_time, 'end_time': activity.end_time}}, status=201)
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
