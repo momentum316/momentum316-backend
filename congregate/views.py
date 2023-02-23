@@ -104,3 +104,27 @@ def new_event(request):
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
+
+
+@csrf_exempt
+def add_user_group(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username', None)
+        group_id = data.get('group_id', None)
+
+        # Look up user and group
+        user = CongregateUser.objects.get(username=username)
+        group = Group.objects.get(id=group_id)
+
+        # Check if user is already a member of the group
+        if user in group.members.all():
+            return JsonResponse({'error': f'{username} is already a member of the group'}, status=409)
+
+        # Add user to group members list
+        group.members.add(user)
+
+        return redirect(f'/group/{group_id}', status=201)
+
+    else:
+        return JsonResponse({'error': 'invalid request method'}, status=405)
