@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import CongregateUser, Group, Event, EventOption
+from .models import CongregateUser, Group, Event, Activity
 
 
 class EventSerializer(ModelSerializer):
@@ -42,8 +42,8 @@ class CongregateUserSerializer(ModelSerializer):
         )
 
 
-class EventOptionSerializer(ModelSerializer):
+class ActivitySerializer(ModelSerializer):
 
     class Meta:
-        model = EventOption
+        model = Activity
         fields = '__all__'

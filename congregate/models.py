@@ -72,7 +72,7 @@ class Event(models.Model):
         return self.title
 
 
-class EventOption(models.Model):
+class Activity(models.Model):
     title = models.CharField(max_length=255)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='options')
     description = models.TextField()
