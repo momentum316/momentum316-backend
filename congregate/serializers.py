@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from .models import CongregateUser, Group, Event, EventOption
 
@@ -17,8 +18,17 @@ class CongregateUserSerializer(ModelSerializer):
 
 
 class GroupSerializer(ModelSerializer):
-    model = Group
-    fields = '__all__'
+    members = serializers.SlugRelatedField(slug_field='username', many=True, read_only=True)
+    admin = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Group
+        fields = (
+            'id',
+            'title',
+            'members',
+            'admin'
+        )
 
 
 class EventSerializer(ModelSerializer):

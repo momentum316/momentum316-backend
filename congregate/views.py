@@ -4,13 +4,13 @@ from django.views.decorators.csrf import csrf_exempt
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
-from .models import CongregateUser
-# Group, Event, EventOption
-from .serializers import CongregateUserSerializer
+from .models import CongregateUser, Group
+# Event, EventOption
+from .serializers import CongregateUserSerializer, GroupSerializer
 # EventSerializer, EventOptionSerializer
 from rest_framework import response
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
-# ListCreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
+# ListAPIView, DestroyAPIView, UpdateAPIView
 import json
 
 # Create your views here.
@@ -63,8 +63,23 @@ class UserHome(RetrieveUpdateDestroyAPIView):
     lookup_field = 'username'
 
 
+class UserGroup(ListCreateAPIView):
+    serializer_class = GroupSerializer
+    lookup_url_kwarg = 'username'
+
+    def get_queryset(self):
+        user = get_object_or_404(CongregateUser, username=self.kwargs['username'])
+        return user.user_groups.all()
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return redirect(f'/{user.username}/groups/', status=201)
+
+
 # class GroupHome(RetrieveUpdateDestroyAPIView):
 #     serializer_class = GroupSerializer
 
 #     def get_queryset(self):
-#         return 
+#         return
