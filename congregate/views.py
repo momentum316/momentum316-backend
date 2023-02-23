@@ -4,8 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
-from .models import CongregateUser, Group
-# Event, EventOption
+from .models import CongregateUser, Group, Event
+# EventOption
 from .serializers import CongregateUserSerializer, GroupSerializer
 # EventSerializer, EventOptionSerializer
 from rest_framework import response
@@ -86,3 +86,21 @@ class GroupHome(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         queryset = Group.objects.filter(id=self.kwargs['group_id'])
         return queryset
+
+
+@csrf_exempt
+def new_event(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        title = data.get('title', None)
+        group_id = data.get('group_id', None)
+
+        # Create and save the new event
+        group = Group.objects.get(id=group_id)
+        event = Event.objects.create(title=title, group=group)
+        event.save()
+
+        return redirect(f'/group/{group_id}', status=201)
+
+    else:
+        return JsonResponse({'error': 'invalid request method'}, status=405)
