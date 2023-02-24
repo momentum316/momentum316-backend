@@ -54,9 +54,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'dj_rest_auth',
     'allauth',
     'allauth.account',
+    'dj_rest_auth',
     'dj_rest_auth.registration',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
@@ -171,13 +171,14 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
     ],
 }
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -187,10 +188,19 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 ]
 
 SITE_ID = 3
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'congregate-auth',
+    'JWT_AUTH_HTTPONLY': False,
+}
+
+LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/'
 
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_SESSION_REMEMBER = None
 ACCOUNT_USERNAME_REQUIRED = True
@@ -219,7 +229,17 @@ SOCIALACCOUNT_PROVIDERS = {
 
 DEFAULT_FROM_EMAIL = 'momentumlearn316@gmail.com'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+# EMAIL_HOST = env('EMAIL_HOST')
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+# EMAIL_PORT = env('EMAIL_PORT')
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'momentumlearn316@gmail.com'
+EMAIL_HOST_PASSWORD = 'byznjpjxtkwmezsx'
+EMAIL_PORT = 587
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
