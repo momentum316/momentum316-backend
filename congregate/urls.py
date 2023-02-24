@@ -1,22 +1,10 @@
-from django.urls import path, re_path
-from allauth.account.views import ConfirmEmailView
-from dj_rest_auth.registration.views import RegisterView, VerifyEmailView
-from dj_rest_auth.views import LoginView, LogoutView
+from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('google/login', views.login_with_google, name='google_login'),
-    path('google/authenticate', views.authenticate_with_google, name='google_authenticate'),
     path('', views.testview, name='test'),
-    path('dj-rest-auth/google/', views.GoogleLogin.as_view(), name='google_login1'),
-    path('register/', RegisterView.as_view()),
-    path('register_new', views.new_user, name='registration'),
-    path('login/', LoginView.as_view()),
-    path('logout/', LogoutView.as_view()),
-    path('verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
-    path('account-confirm-email/', VerifyEmailView.as_view(), name='account_email_verification_sent'),
-    re_path(r'^account-confirm-email/(?P<key>[-:\w]+)/$', VerifyEmailView.as_view(), name='account_confirm_email'),
-    path('account-confirm-email/<str:key>/', ConfirmEmailView.as_view()),
+    path('dj-rest-auth/google/', views.GoogleLogin.as_view(), name='google_login'),
+    path('register', views.new_user, name='registration'),
     path('<slug:username>/home/', views.UserHome.as_view(), name='home'),
     path('<slug:username>/groups/', views.UserGroup.as_view(), name='user_groups'),
     path('group/<int:group_id>', views.GroupHome.as_view(), name='group_home'),
