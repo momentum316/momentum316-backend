@@ -3,11 +3,32 @@ from rest_framework.serializers import ModelSerializer
 from .models import CongregateUser, Group, Event, Activity
 
 
+# class VoteSerializer(ModelSerializer):
+
+#     class Meta:
+#         model = Vote
+#         fields = (
+#             'id',
+#             'voter',
+#             'activity',
+#             'vote',
+#         )
+
+
 class ActivitySerializer(ModelSerializer):
+    creator = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = Activity
-        fields = '__all__'
+        fields = (
+            'id',
+            'title',
+            'event',
+            'creator',
+            'description',
+            'start_time',
+            'end_time'
+        )
 
 
 class EventSerializer(ModelSerializer):

@@ -10,21 +10,24 @@ Documentation starts here:
 
 ### API ENDPOINTS
 
-| HTTP Verbs | Endpoints            | Action                              |
-| ---------- | -------------------- | ----------------------------------- |
-| POST       | /register            | Register new user                   |
-| POST       | /api-token-auth/     | Login                               |
-| GET        | /\<username\>/home   | User home page                      |
-| GET        | /\<username\>/groups | List all of the user's groups       |
-| POST       | /new/group           | Create a new group                  |
-| GET        | /group/\<group_id\>  | Group home page                     |
-| PATCH      | /group/\<group_id\>  | Edit group home page                |
-| POST       | /add-user-group      | Join a user to the group            |
-| POST       | /new/event           | Create a new event for the group    |
-| GET        | /event/\<event_id\>  | Event home page                     |
-| PATCH      | /event/\<event_id\>  | Update an event                     |
-| DELETE     | /event/\<event_id\>  | Delete an event                     |
-| POST       | /new/activity        | Create a new activity for the event |
+| HTTP Verbs | Endpoints                 | Action                              |
+| ---------- | ------------------------- | ----------------------------------- |
+| POST       | /register                 | Register new user                   |
+| POST       | /api-token-auth/          | Login                               |
+| GET        | /\<username\>/home        | User home page                      |
+| GET        | /\<username\>/groups      | List all of the user's groups       |
+| POST       | /new/group                | Create a new group                  |
+| GET        | /group/\<group_id\>       | Group home page                     |
+| PATCH      | /group/\<group_id\>       | Edit group home page                |
+| POST       | /add-user-group           | Join a user to the group            |
+| POST       | /new/event                | Create a new event for the group    |
+| GET        | /event/\<event_id\>       | Event home page                     |
+| PATCH      | /event/\<event_id\>       | Update an event                     |
+| DELETE     | /event/\<event_id\>       | Delete an event                     |
+| POST       | /new/activity             | Create a new activity for the event |
+| GET        | /activity/\<activity_id\> | Activity home page                  |
+| PATCH      | /activity/\<activity_id\> | Update an activity                  |
+| DELETE     | /activity/\<activity_id\> | Delete an activity                  |
 
 ## Register a new user
 
@@ -459,4 +462,50 @@ POST /new/activity/
     "end_time": "2023-02-24T09:14:53.955425Z"
   }
 }
+```
+
+## Update an activity
+
+### request
+
+Requires authentication
+
+```txt
+POST /activity/<activity_id>
+```
+
+```json
+{
+  "title": "Bowling night!"
+}
+```
+
+### response
+
+```json
+200 OK
+
+{
+  "activity": {
+    "id": 3,
+    "title": "Bowling night!",
+    "description": "You must use your left hand to bowl!",
+    "start_time": "2023-02-24T06:14:53.955425Z",
+    "end_time": "2023-02-24T09:14:53.955425Z"
+  }
+}
+```
+
+## Delete an activity
+
+### request
+
+```txt
+DELETE /activity/<activity_id>/
+```
+
+### response
+
+```json
+204 No Content
 ```

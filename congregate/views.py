@@ -5,10 +5,9 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 from .models import CongregateUser, Group, Event, Activity
-# Activity
-from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer,ActivitySerializer
+from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer
 from rest_framework import response
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView
 import json
 
 # Create your views here.
@@ -54,7 +53,7 @@ class GoogleLogin(SocialLoginView):
     client_class = OAuth2Client
 
 
-class UserHome(RetrieveUpdateDestroyAPIView):
+class UserHome(RetrieveUpdateAPIView):
     queryset = CongregateUser.objects.all()
     serializer_class = CongregateUserSerializer
     lookup_url_kwarg = 'username'
@@ -154,16 +153,28 @@ def new_activity(request):
         data = json.loads(request.body)
         title = data.get('title', None)
         event_id = data.get('event_id', None)
+        username = data.get('username', None)
         description = data.get('description', None)
         start_time = data.get('start_time', None)
         end_time = data.get('end_time', None)
 
         # Create and save the new event
+        creator = CongregateUser.objects.get(username=username)
         event = Event.objects.get(id=event_id)
-        activity = Activity.objects.create(title=title, event=event, description=description, start_time=start_time, end_time=end_time)
+        activity = Activity.objects.create(title=title, event=event, creator=creator, description=description, start_time=start_time, end_time=end_time)
         activity.save()
 
         return JsonResponse({'activity': {'id': activity.id, 'title': activity.title, 'description': activity.description, 'start_time': activity.start_time, 'end_time': activity.end_time}}, status=201)
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
+
+
+class ActivityUpdate(RetrieveUpdateDestroyAPIView):
+    queryset = Activity.objects.all()
+    serializer_class = ActivitySerializer
+    lookup_url_kwarg = 'activity_id'
+
+    def get_queryset(self):
+        queryset = Activity.objects.filter(id=self.kwargs['activity_id'])
+        return queryset
