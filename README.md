@@ -13,13 +13,17 @@ Documentation starts here:
 | HTTP Verbs | Endpoints            | Action                              |
 | ---------- | -------------------- | ----------------------------------- |
 | POST       | /register            | Register new user                   |
+| POST       | /api-token-auth/     | Login                               |
 | GET        | /\<username\>/home   | User home page                      |
 | GET        | /\<username\>/groups | List all of the user's groups       |
 | POST       | /new/group           | Create a new group                  |
 | GET        | /group/\<group_id\>  | Group home page                     |
+| PATCH      | /group/\<group_id\>  | Edit group home page                |
 | POST       | /add-user-group      | Join a user to the group            |
 | POST       | /new/event           | Create a new event for the group    |
 | GET        | /event/\<event_id\>  | Event home page                     |
+| PATCH      | /event/\<event_id\>  | Update an event                     |
+| DELETE     | /event/\<event_id\>  | Delete an event                     |
 | POST       | /new/activity        | Create a new activity for the event |
 
 ## Register a new user
@@ -225,6 +229,42 @@ GET /group/<group_id>
 }
 ```
 
+## Edit a group
+
+Requires authentication
+
+### request
+
+```txt
+PATCH /group/<group_id>/
+```
+
+```json
+200 OK
+
+{
+	"id": 3,
+	"title": "Edited Group Title",
+	"members": [
+		"jcox",
+		"testuser1",
+		"justcapel"
+	],
+	"admin": "justcapel",
+	"event_list": [
+		{
+			"id": 3,
+			"title": "This weekend",
+			"voting": true,
+			"date": "2023-02-23",
+			"activity_list": [],
+			"group": "Edited Group Title",
+			"vote_closing_time": "2023-02-23T06:14:53.955425Z"
+		}
+	]
+}
+```
+
 ## Join a user to the group
 
 ### request
@@ -339,6 +379,52 @@ GET /event/<event_id>
 }
 ```
 
+## Update an event
+
+### request
+
+Requires authentication
+
+```txt
+PATCH /group/<group_id>/
+```
+
+```json
+{
+  "title": "Change this title"
+}
+```
+
+### response
+
+```json
+200 OK
+
+{
+	"id": 3,
+	"title": "Change this title",
+	"voting": true,
+	"date": "2023-02-23",
+	"activity_list": [],
+	"group": "Edited Group Title",
+	"vote_closing_time": "2023-02-23T06:14:53.955425Z"
+}
+```
+
+## Delete an event
+
+### request
+
+```txt
+DELETE /event/<event_id>/
+```
+
+### response
+
+```json
+204 No Content
+```
+
 ## Create a new activity for the event
 
 ### request
@@ -362,6 +448,8 @@ POST /new/activity/
 ### response
 
 ```json
+201 Created
+
 {
   "activity": {
     "id": 3,
