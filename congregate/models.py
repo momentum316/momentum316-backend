@@ -75,6 +75,7 @@ class Event(models.Model):
 class Activity(models.Model):
     title = models.CharField(max_length=255)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='activities')
+    creator = models.ForeignKey(CongregateUser, on_delete=models.CASCADE, related_name='activities', null=True)
     description = models.TextField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
@@ -85,8 +86,7 @@ class Activity(models.Model):
 
 # class Vote(models.Model):
 #     voter = models.ForeignKey(CongregateUser, on_delete=models.CASCADE, related_name='votes')
-#     # talk to group about on delete CASCADE here ^^
-#     event_option = models.ForeignKey(EventOption, on_delete=models.CASCADE, related_name='votes')
+#     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='votes')
 #     vote = models.IntegerField(
 #         default=0,
 #         validators=[MaxValueValidator(1), MinValueValidator(-1)]

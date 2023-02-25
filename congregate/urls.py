@@ -13,4 +13,5 @@ urlpatterns = [
     path('event/<int:event_id>', views.EventHome.as_view(), name='event_home'),
     path('add-user-group/', views.add_user_group, name='add_user_group'),
     path('new/activity/', views.new_activity, name='new_event'),
+    path('activity/<int:activity_id>', views.ActivityUpdate.as_view(), name='activity_update'),
 ]
