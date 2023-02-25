@@ -13,6 +13,7 @@ Documentation starts here:
 | HTTP Verbs | Endpoints            | Action                              |
 | ---------- | -------------------- | ----------------------------------- |
 | POST       | /register            | Register new user                   |
+| POST       | /api-token-auth/     | Login                               |
 | GET        | /\<username\>/home   | User home page                      |
 | GET        | /\<username\>/groups | List all of the user's groups       |
 | POST       | /new/group           | Create a new group                  |

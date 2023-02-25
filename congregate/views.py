@@ -89,6 +89,10 @@ class GroupHome(RetrieveUpdateDestroyAPIView):
     serializer_class = GroupSerializer
     lookup_url_kwarg = 'group_id'
 
+    def get_queryset(self):
+        queryset = Group.objects.filter(id=self.kwargs['group_id'])
+        return queryset
+
 
 class EventHome(RetrieveUpdateDestroyAPIView):
     serializer_class = EventSerializer
