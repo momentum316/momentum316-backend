@@ -15,6 +15,7 @@ Documentation starts here:
 | POST       | /register            | Register new user                   |
 | GET        | /\<username\>/home   | User home page                      |
 | GET        | /\<username\>/groups | List all of the user's groups       |
+| POST       | /new/group           | Create a new group                  |
 | GET        | /group/\<group_id\>  | Group home page                     |
 | POST       | /add-user-group      | Join a user to the group            |
 | POST       | /new/event           | Create a new event for the group    |
@@ -146,6 +147,36 @@ GET /<username>/groups
 		]
 	}
 ]
+```
+
+## Create a new group
+
+Requires group title and the username of the user creating the group
+
+### request
+
+```txt
+POST new/group/
+```
+
+```json
+{
+  "title": "Another awesome group",
+  "username": "jcox"
+}
+```
+
+### response
+
+```json
+200 OK
+
+{
+	"group": {
+		"id": 9,
+		"title": "Another awesome group"
+	}
+}
 ```
 
 ## Group home page
