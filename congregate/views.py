@@ -199,3 +199,33 @@ class Voting(UpdateAPIView):
             return redirect(self.request.META.get('HTTP_REFERER'))
         queryset = Vote.objects.filter(id=self.kwargs['vote_id'])
         return queryset
+
+
+def submit_vote(request):
+    if request.method == 'POST':
+        username = request.data.get('username', None)
+        event_id = request.data.get('event_id', None)
+
+        # Look up user and event
+        user = CongregateUser.objects.get(username=username)
+        event = Event.objects.get(id=event_id)
+
+        # Check if user has already submitted votes
+        if user in event.voters.all():
+            return JsonResponse({'error': f'{username} has already voted'}, status=409)
+
+        # If user not found...
+        # If group does not exists, throw 404
+
+        # Add user to group members list
+        event.voted.add(user)
+
+        group = event.group
+
+        if group.members.count() == event.voted.count():
+            return redirect(winner)
+
+        return redirect(f'/event/{event_id}', status=201)
+
+    else:
+        return JsonResponse({'error': 'invalid request method'}, status=405)

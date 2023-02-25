@@ -67,6 +67,7 @@ class Event(models.Model):
     voting = models.BooleanField(default=False)
     date = models.DateField()
     vote_closing_time = models.DateTimeField()
+    voter = models.ManyToManyField(User, related_name='voted_events', blank=True)
 
     def __str__(self):
         return self.title
