@@ -195,5 +195,7 @@ class Voting(UpdateAPIView):
 
     def get_queryset(self):
         vote = Vote.objects.get(id=self.kwargs['vote_id'])
-        queryset = vote
+        if self.request.data.get('username') != vote.voter.username:
+            return redirect(self.request.META.get('HTTP_REFERER'))
+        queryset = Vote.objects.filter(id=self.kwargs['vote_id'])
         return queryset

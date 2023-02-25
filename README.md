@@ -28,6 +28,7 @@ Documentation starts here:
 | GET        | /activity/\<activity_id\> | Activity home page                  |
 | PATCH      | /activity/\<activity_id\> | Update an activity                  |
 | DELETE     | /activity/\<activity_id\> | Delete an activity                  |
+| PATCH      | /vote/\<vote_id\>         | User can change vote                |
 
 ## Register a new user
 
@@ -508,4 +509,34 @@ DELETE /activity/<activity_id>/
 
 ```json
 204 No Content
+```
+
+## User updates vote
+
+Requires authentication
+
+### request
+
+```txt
+PATCH /vote/<vote_id>/
+```
+
+```json
+{
+  "username": "jcox",
+  "vote": 1
+}
+```
+
+### response
+
+```json
+200 OK
+
+{
+	"id": 1,
+	"voter": 1,
+	"activity": "Vote activity",
+	"vote": 1
+}
 ```
