@@ -1,13 +1,12 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
-from .models import CongregateUser, Group, Event, Activity
-from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer
-from rest_framework import response
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView
+from .models import CongregateUser, Group, Event, Activity, Vote
+from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
 import json
 
 # Create your views here.
@@ -138,8 +137,12 @@ def add_user_group(request):
         if user in group.members.all():
             return JsonResponse({'error': f'{username} is already a member of the group'}, status=409)
 
+        # If user not found...
+        # If group does not exists, throw 404
+
         # Add user to group members list
         group.members.add(user)
+
 
         return redirect(f'/group/{group_id}', status=201)
 
@@ -164,6 +167,11 @@ def new_activity(request):
         activity = Activity.objects.create(title=title, event=event, creator=creator, description=description, start_time=start_time, end_time=end_time)
         activity.save()
 
+        group = event.group
+        for member in group.members.all():
+            vote = Vote.objects.create(voter=member, activity=activity)
+            vote.save()
+
         return JsonResponse({'activity': {'id': activity.id, 'title': activity.title, 'description': activity.description, 'start_time': activity.start_time, 'end_time': activity.end_time}}, status=201)
 
     else:
@@ -177,4 +185,15 @@ class ActivityUpdate(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         queryset = Activity.objects.filter(id=self.kwargs['activity_id'])
+        return queryset
+
+
+class Voting(UpdateAPIView):
+    queryset = Vote.objects.all()
+    serializer_class = VoteSerializer
+    lookup_url_kwarg = 'vote_id'
+
+    def get_queryset(self):
+        vote = Vote.objects.get(id=self.kwargs['vote_id'])
+        queryset = vote
         return queryset
