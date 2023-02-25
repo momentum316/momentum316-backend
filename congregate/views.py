@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -8,8 +8,7 @@ from .models import CongregateUser, Group, Event, Activity
 # Activity
 from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer,ActivitySerializer
 from rest_framework import response
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
-# ListAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, ListAPIView, DestroyAPIView, UpdateAPIView
 import json
 
 # Create your views here.
@@ -62,20 +61,28 @@ class UserHome(RetrieveUpdateDestroyAPIView):
     lookup_field = 'username'
 
 
-class UserGroup(ListCreateAPIView):
+@csrf_exempt
+def create_group_view(request):
+    data = json.loads(request.body)
+    username = data.get('username', None)
+    title = data.get('title', None)
+    user = get_object_or_404(CongregateUser, username=username)
+
+    group = Group.objects.create(title=title, admin=user)
+    group.members.add(user)
+    group.save()
+
+    return JsonResponse({'group': {'id': group.id, 'title': group.title}}, status=201)
+
+
+class UserGroup(ListAPIView):
+    queryset = Group.objects.all()
     serializer_class = GroupSerializer
     lookup_url_kwarg = 'username'
 
     def get_queryset(self):
         user = get_object_or_404(CongregateUser, username=self.kwargs['username'])
         return user.user_groups.all()
-
-    def create(self, request):
-        user = get_object_or_404(CongregateUser, username=self.kwargs['username'])
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return redirect(f'/{user.username}/groups/', status=201)
 
 
 class GroupHome(RetrieveUpdateDestroyAPIView):

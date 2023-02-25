@@ -7,6 +7,7 @@ urlpatterns = [
     path('register', views.new_user, name='registration'),
     path('<slug:username>/home/', views.UserHome.as_view(), name='home'),
     path('<slug:username>/groups/', views.UserGroup.as_view(), name='user_groups'),
+    path('new/group/', views.create_group_view, name='new_group'),
     path('group/<int:group_id>', views.GroupHome.as_view(), name='group_home'),
     path('new/event/', views.new_event, name='new_event'),
     path('event/<int:event_id>', views.EventHome.as_view(), name='event_home'),

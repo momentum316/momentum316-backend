@@ -20,7 +20,6 @@ class EventSerializer(ModelSerializer):
             'id',
             'title',
             'voting',
-            'winning_activity'
             'date',
             'activity_list',
             'group',
