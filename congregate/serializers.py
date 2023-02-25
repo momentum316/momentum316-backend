@@ -1,22 +1,28 @@
+from django.db.models import Sum
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
-from .models import CongregateUser, Group, Event, Activity
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from .models import CongregateUser, Group, Event, Activity, Vote
 
 
-# class VoteSerializer(ModelSerializer):
+class VoteSerializer(ModelSerializer):
+    activity = serializers.SlugRelatedField(slug_field='title', read_only=True)
 
-#     class Meta:
-#         model = Vote
-#         fields = (
-#             'id',
-#             'voter',
-#             'activity',
-#             'vote',
-#         )
+    class Meta:
+        model = Vote
+        fields = (
+            'id',
+            'voter',
+            'activity',
+            'vote',
+        )
 
 
 class ActivitySerializer(ModelSerializer):
     creator = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    total_votes = SerializerMethodField('get_total_votes')
+
+    def get_total_votes(self, obj):
+        return obj.votes.aggregate(total_votes=Sum('vote'))['total_votes']
 
     class Meta:
         model = Activity
@@ -27,7 +33,8 @@ class ActivitySerializer(ModelSerializer):
             'creator',
             'description',
             'start_time',
-            'end_time'
+            'end_time',
+            'total_votes',
         )
 
 

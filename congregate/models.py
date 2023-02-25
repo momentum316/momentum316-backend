@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.mail import send_mail
-# from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 
@@ -84,10 +84,10 @@ class Activity(models.Model):
         return self.title
 
 
-# class Vote(models.Model):
-#     voter = models.ForeignKey(CongregateUser, on_delete=models.CASCADE, related_name='votes')
-#     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='votes')
-#     vote = models.IntegerField(
-#         default=0,
-#         validators=[MaxValueValidator(1), MinValueValidator(-1)]
-#     )
+class Vote(models.Model):
+    voter = models.ForeignKey(CongregateUser, on_delete=models.CASCADE, related_name='votes')
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='votes')
+    vote = models.IntegerField(
+        default=0,
+        validators=[MaxValueValidator(1), MinValueValidator(-1)]
+    )
