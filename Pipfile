@@ -17,6 +17,8 @@ psycopg2-binary = "*"
 dj-rest-auth = "*"
 whitenoise = "*"
 gunicorn = "*"
+celery = "*"
+redis = "*"
 
 [dev-packages]
 flake8 = "*"

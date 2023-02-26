@@ -231,6 +231,8 @@ def submit_vote(request):
         group = event.group
 
         if group.members.count() <= event.event_voter.count():
+            event.decided = True
+            event.save()
             return redirect(f'/event-winner/{event_id}')
 
         return redirect(f'/event/{event_id}', status=201)
