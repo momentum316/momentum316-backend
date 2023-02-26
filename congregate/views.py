@@ -5,7 +5,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 from .models import CongregateUser, Group, Event, Activity, Vote
-from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer
+from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer, DecidedEventSerializer
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
 import json
 
@@ -93,8 +93,13 @@ class GroupHome(RetrieveUpdateDestroyAPIView):
 
 
 class EventHome(RetrieveUpdateDestroyAPIView):
-    serializer_class = EventSerializer
     lookup_url_kwarg = 'event_id'
+
+    def get_serializer_class(self):
+        event = self.get_object()
+        if event.decided:
+            return DecidedEventSerializer
+        return EventSerializer
 
     def get_queryset(self):
         queryset = Event.objects.filter(id=self.kwargs['event_id'])
@@ -137,12 +142,12 @@ def add_user_group(request):
         if user in group.members.all():
             return JsonResponse({'error': f'{username} is already a member of the group'}, status=409)
 
+        # Need to add these
         # If user not found...
         # If group does not exists, throw 404
 
         # Add user to group members list
         group.members.add(user)
-
 
         return redirect(f'/group/{group_id}', status=201)
 
@@ -201,31 +206,45 @@ class Voting(UpdateAPIView):
         return queryset
 
 
+@csrf_exempt
 def submit_vote(request):
     if request.method == 'POST':
-        username = request.data.get('username', None)
-        event_id = request.data.get('event_id', None)
+        data = json.loads(request.body)
+        username = data.get('username', None)
+        event_id = data.get('event_id', None)
 
         # Look up user and event
         user = CongregateUser.objects.get(username=username)
         event = Event.objects.get(id=event_id)
 
         # Check if user has already submitted votes
-        if user in event.voters.all():
+        if user in event.event_voter.all():
             return JsonResponse({'error': f'{username} has already voted'}, status=409)
 
+        # Need to add these
         # If user not found...
-        # If group does not exists, throw 404
+        # If event does not exists, throw 404
 
-        # Add user to group members list
-        event.voted.add(user)
+        # Add user to event.voted list
+        event.event_voter.add(user)
 
         group = event.group
 
-        if group.members.count() == event.voted.count():
-            return redirect(winner)
+        if group.members.count() <= event.event_voter.count():
+            return redirect(f'/event-winner/{event_id}')
 
         return redirect(f'/event/{event_id}', status=201)
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
+
+
+class DecideEvent(RetrieveUpdateAPIView):
+    queryset = Event.objects.all()
+    serializer_class = DecidedEventSerializer
+    lookup_url_kwarg = 'event_id'
+
+    def get_queryset(self):
+        event = Event.objects.get(id=self.kwargs['event_id'])
+        event.decided = True
+        return Event.objects.filter(id=self.kwargs['event_id'])
