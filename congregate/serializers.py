@@ -32,6 +32,7 @@ class ActivitySerializer(ModelSerializer):
             'event',
             'creator',
             'description',
+            'location',
             'start_time',
             'end_time',
             'total_votes',
