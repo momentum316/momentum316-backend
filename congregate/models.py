@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.mail import send_mail
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils import timezone
+
 
 # Create your models here.
 
@@ -65,11 +67,34 @@ class Event(models.Model):
     title = models.CharField(max_length=255)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='events')
     voting = models.BooleanField(default=False)
-    date = models.DateField()
-    vote_closing_time = models.DateTimeField()
+    date = models.DateTimeField()
+    vote_closing_time = models.DateTimeField(default=timezone.now() + timezone.timedelta(hours=24))
+    event_voter = models.ManyToManyField(CongregateUser, related_name='voted_events', blank=True)
+    decided = models.BooleanField(default=False)
+    decide_event_task = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            super().save(*args, **kwargs)
+            from .tasks import decide_event
+            decide_event_task = decide_event.apply_async(args=[self.id], eta=self.vote_closing_time).id
+            self.decide_event_task = decide_event_task
+        else:
+            existing_event = Event.objects.get(pk=self.pk)
+            if existing_event.vote_closing_time != self.vote_closing_time:
+                from .tasks import decide_event
+                if self.decide_event_task is not None:
+                    decide_event.AsyncResult(self.decide_event_task).revoke()
+                if not self.decided:
+                    decide_event_task = decide_event.apply_async(args=[self.id], eta=self.vote_closing_time).id
+                    self.decide_event_task = decide_event_task
+                else:
+                    self.decide_event_task = None
+
+            super().save(*args, **kwargs)
 
 
 class Activity(models.Model):

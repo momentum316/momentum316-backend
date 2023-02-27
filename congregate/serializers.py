@@ -52,6 +52,30 @@ class EventSerializer(ModelSerializer):
             'activity_list',
             'group',
             'vote_closing_time',
+            'decided',
+        )
+
+
+class DecidedEventSerializer(ModelSerializer):
+    group = serializers.SlugRelatedField(slug_field='title', read_only=True)
+    activity_list = SerializerMethodField('get_activity_list')
+
+    def get_activity_list(self, obj):
+        activities = obj.activities.all().order_by('-votes')
+        serializer = ActivitySerializer(activities, many=True)
+        return serializer.data
+
+    class Meta:
+        model = Event
+        fields = (
+            'id',
+            'title',
+            'voting',
+            'date',
+            'activity_list',
+            'group',
+            'vote_closing_time',
+            'decided',
         )
 
 
