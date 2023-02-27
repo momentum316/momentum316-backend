@@ -19,6 +19,7 @@ whitenoise = "*"
 gunicorn = "*"
 celery = "*"
 redis = "*"
+django-on-heroku = "*"
 
 [dev-packages]
 flake8 = "*"
