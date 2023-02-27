@@ -29,6 +29,7 @@ Documentation starts here:
 | PATCH      | /activity/\<activity_id\> | Update an activity                  |
 | DELETE     | /activity/\<activity_id\> | Delete an activity                  |
 | PATCH      | /vote/\<vote_id\>         | User can change vote                |
+| POST       | /submit-vote/             | User submits votes for an event     |
 
 ## Register a new user
 
@@ -538,5 +539,68 @@ PATCH /vote/<vote_id>/
 	"voter": 1,
 	"activity": "Vote activity",
 	"vote": 1
+}
+```
+
+## User submits a vote
+
+```txt
+POST /submit-vote/
+```
+
+### request
+
+```json
+{
+  "username": "congregate",
+  "event_id": 6
+}
+```
+
+### response
+
+```json
+200 OK
+
+{
+	"id": 6,
+	"title": "test",
+	"voting": true,
+	"date": "2023-02-24T00:00:00Z",
+	"activity_list": [
+		{
+			"id": 10,
+			"title": "Bowling night",
+			"event": 6,
+			"creator": "bjenkins",
+			"description": "I just wanna break triple digits",
+			"start_time": "2023-02-26T16:00:00Z",
+			"end_time": "2023-02-26T18:00:00Z",
+			"total_votes": -2
+		},
+		{
+			"id": 9,
+			"title": "Capel's concert",
+			"event": 6,
+			"creator": "congreg8",
+			"description": "Capel's band is sick",
+			"start_time": "2023-02-26T19:00:00Z",
+			"end_time": "2023-02-26T21:00:00Z",
+			"total_votes": 4
+		},
+		{
+			"id": 8,
+			"title": "Go to the movies",
+			"event": 6,
+			"creator": "jcox",
+			"description": "Let's watch that new Power Rangers, yo",
+			"start_time": "2023-02-26T15:00:00Z",
+			"end_time": "2023-02-26T17:00:00Z",
+			"total_votes": 1
+		},
+	],
+	"group": "Friday night",
+	"vote_closing_time": "2023-02-25T20:02:13Z",
+	"decided": true
 }
 ```
