@@ -445,6 +445,7 @@ POST /new/activity/
   "title": "Left-handed bowling night",
   "event_id": 1,
   "description": "You must use your left hand to bowl!",
+  "location": "Uptown Bowling",
   "start_time": "2023-02-24T06:14:53.955425Z",
   "end_time": "2023-02-24T09:14:53.955425Z"
 }
@@ -460,6 +461,7 @@ POST /new/activity/
     "id": 3,
     "title": "Left-handed bowling night",
     "description": "You must use your left hand to bowl!",
+		"location": "Uptown Bowling",
     "start_time": "2023-02-24T06:14:53.955425Z",
     "end_time": "2023-02-24T09:14:53.955425Z"
   }
