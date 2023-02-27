@@ -102,6 +102,7 @@ class Activity(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='activities')
     creator = models.ForeignKey(CongregateUser, on_delete=models.CASCADE, related_name='activities', null=True)
     description = models.TextField()
+    location = models.TextField(null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
