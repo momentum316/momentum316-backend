@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import environ
 from corsheaders.defaults import default_headers
+import django_on_heroku
+
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -192,6 +194,16 @@ LOGIN_REDIRECT_URL = '/'
 CELERY_BROKER_URL = env('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 CELERY_TIMEZONE = env('CELERY_TIMEZONE')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+django_on_heroku.settings(locals())
+del DATABASES['default']['OPTIONS']['sslmode']
+
+GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
+GOOGLE_SECRET_KEY = env('GOOGLE_SECRET_KEY')
+
 
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4975ad0bcbb4b0bb1335c5ceb147e377816d9f9f3050e4feb7b9e39f830f1030"
+            "sha256": "0bd0fe842d0cbf922bd3ad89569b1b05436dde44109d3adb3086c6af82af3d07"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -307,6 +307,13 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==0.7.1"
         },
+        "dj-database-url": {
+            "hashes": [
+                "sha256:5c2993b91801c0f78a8b19e642b497b90831124cbade0c265900d4c1037b4730",
+                "sha256:b23b15046cb38180e0c95207bcc90fe5e9dbde8eef16065907dd85cf4ca7036c"
+            ],
+            "version": "==1.2.0"
+        },
         "dj-rest-auth": {
             "hashes": [
                 "sha256:ee792c6b380dac20ecacb79769681cc30896f56ddf8212d370f7c220a5c6a0cf"
@@ -352,6 +359,14 @@
             ],
             "index": "pypi",
             "version": "==3.2.1"
+        },
+        "django-on-heroku": {
+            "hashes": [
+                "sha256:4a72ade056335112cba22eea332552d840b718dd8140d43c2d70bb739875955b",
+                "sha256:a41fe83ef7ecb022ca92b2950a61f79fef156e58f4f35fc7fc4ecacdc5225fb8"
+            ],
+            "index": "pypi",
+            "version": "==1.1.2"
         },
         "django-storages": {
             "hashes": [
