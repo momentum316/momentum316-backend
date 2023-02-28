@@ -13,7 +13,7 @@ Documentation starts here:
 | HTTP Verbs | Endpoints                 | Action                              |
 | ---------- | ------------------------- | ----------------------------------- |
 | POST       | /register                 | Register new user                   |
-| POST       | /api-token-auth/          | Front end login for API token       |
+| POST       | /login                    | Login or create new user            |
 | GET        | /\<username\>/home        | User home page                      |
 | GET        | /\<username\>/groups      | List all of the user's groups       |
 | POST       | /new/group                | Create a new group                  |
@@ -62,6 +62,34 @@ POST /register
 	"last_name": "User",
 	"email": "fakeemail@gmail.com",
 	"avatar": null
+}
+```
+
+## Login
+
+###
+
+```txt
+POST /login
+```
+
+```json
+{
+  "email": "fakeemail@gmail.com"
+}
+```
+
+### response
+
+```json
+200 OK
+
+{
+	"user": {
+		"id": "6",
+		"email": "fakeemail@gmail.com"
+	},
+	"token": "y22833c083d494b7c2683f53457376d7d8379a40"
 }
 ```
 
