@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.mail import send_mail
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
 
@@ -10,47 +8,11 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
-    avatar = models.ImageField(upload_to='media/', blank=True, null=True)
+    avatarURL = models.URLField(max_length=1000, null=True)
+    # avatar = models.ImageField(upload_to='media/', blank=True, null=True)
 
     def __str__(self):
         return self.username
-
-
-class CongregateUser(models.Model):
-    username_validator = UnicodeUsernameValidator()
-
-    username = models.CharField(
-        max_length=150,
-        unique=True,
-        help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.',
-        validators=[username_validator],
-        error_messages={
-            'unique': 'A user with that username already exists.',
-        },
-    )
-    first_name = models.CharField(max_length=150, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
-    email = models.EmailField()
-    avatar = models.ImageField(upload_to='media/', blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.username
-
-    def get_full_name(self):
-        """
-        Return the first_name plus the last_name, with a space in between.
-        """
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
-
-    def get_short_name(self):
-        """Return the short name for the user."""
-        return self.first_name
-
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        """Send an email to this user."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
 class Group(models.Model):
@@ -104,6 +66,7 @@ class Activity(models.Model):
     location = models.TextField(null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    attendees = models.ManyToManyField(User, related_name='attending_activities', blank=True)
 
     def __str__(self):
         return self.title

@@ -111,6 +111,6 @@ class UserSerializer(ModelSerializer):
             'first_name',
             'last_name',
             'email',
-            'avatar',
+            'avatarURL',
             'group_list',
         )

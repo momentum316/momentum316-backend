@@ -26,8 +26,10 @@ def logintest(request):
 def GoogleLogin(request):
     data = json.loads(request.body)
     email = data.get('email', None)
+    username = data.get('username', None)
     first_name = data.get('first_name', None)
     last_name = data.get('last_name', None)
+    avatar = data.get('avatar', None)
 
     user = authenticate(request, username=email)
     if user is not None:
@@ -38,19 +40,25 @@ def GoogleLogin(request):
         response_data = {
             'user': {
                 'id': str(user.id),
+                'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
+                'avatar': user.avatarURL
             },
         }
         response_data['token'] = token.key
         return JsonResponse(response_data)
     else:
-        user = User.objects.create(username=email, email=email)
+        user = User.objects.create(email=email)
+        if username is not None:
+            user.username = username
         if first_name is not None:
             user.first_name = first_name
         if last_name is not None:
             user.last_name = last_name
+        if avatar is not None:
+            user.avatarURL = avatar
         login(request, user, backend='config.auth_backend.EmailBackend')
 
         token, created = Token.objects.get_or_create(user=user)
@@ -59,8 +67,10 @@ def GoogleLogin(request):
             'user': {
                 'id': str(user.id),
                 'email': user.email,
+                'username': user.username,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
+                'avatar': user.avatarURL
             },
         }
         response_data['token'] = token.key
