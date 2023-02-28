@@ -5,7 +5,7 @@ from django.conf import settings
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 app = Celery(
-    "myproj",
+    "config",
     broker_use_ssl={
         'ssl_cert_reqs': ssl.CERT_NONE
     },

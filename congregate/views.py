@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from .models import CongregateUser, Group, Event, Activity, Vote
+from .models import User, CongregateUser, Group, Event, Activity, Vote
 from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer, DecidedEventSerializer
 from rest_framework.generics import RetrieveAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
 import json
@@ -25,6 +25,8 @@ def logintest(request):
 def GoogleLogin(request):
     data = json.loads(request.body)
     email = data.get('email', None)
+    first_name = data.get('first_name', None)
+    last_name = data.get('last_name', None)
 
     user = authenticate(request, username=email)
     if user is not None:
@@ -36,13 +38,32 @@ def GoogleLogin(request):
             'user': {
                 'id': str(user.id),
                 'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
             },
         }
         response_data['token'] = token.key
         return JsonResponse(response_data)
+    else:
+        user = User.objects.create(username=email, email=email)
+        if first_name is not None:
+            user.first_name = first_name
+        if last_name is not None:
+            user.last_name = last_name
+        login(request, user, backend='config.auth_backend.EmailBackend')
 
-    # return an error response if authentication fails
-    return JsonResponse({'error': 'Invalid credentials'}, status=401)
+        token, created = Token.objects.get_or_create(user=user)
+
+        response_data = {
+            'user': {
+                'id': str(user.id),
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            },
+        }
+        response_data['token'] = token.key
+        return JsonResponse(response_data)
 
 
 @csrf_exempt
@@ -269,20 +290,8 @@ def submit_vote(request):
         if group.members.count() <= event.event_voter.count():
             event.decided = True
             event.save()
-            return redirect(f'/event-winner/{event_id}')
 
         return redirect(f'/event/{event_id}', status=201)
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
-
-
-class DecideEvent(RetrieveUpdateAPIView):
-    queryset = Event.objects.all()
-    serializer_class = DecidedEventSerializer
-    lookup_url_kwarg = 'event_id'
-
-    def get_queryset(self):
-        event = Event.objects.get(id=self.kwargs['event_id'])
-        event.decided = True
-        return Event.objects.filter(id=self.kwargs['event_id'])
