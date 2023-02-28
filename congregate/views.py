@@ -4,7 +4,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from .models import CongregateUser, Group, Event, Activity, Vote
 from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer, DecidedEventSerializer
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
 import json
 from rest_framework.authtoken.models import Token
 
@@ -83,6 +83,16 @@ class UserHome(RetrieveUpdateAPIView):
     serializer_class = CongregateUserSerializer
     lookup_url_kwarg = 'username'
     lookup_field = 'username'
+
+
+class UserOpenVote(ListAPIView):
+    serializer_class = EventSerializer
+    lookup_url_kwarg = 'username'
+
+    def get_queryset(self):
+        user = get_object_or_404(CongregateUser, username=self.kwargs['username'])
+        group_ids = user.user_groups.values_list('id', flat=True)
+        return Event.objects.filter(group__id__in=group_ids, voting=True, decided=False).exclude(event_voter=user)
 
 
 @csrf_exempt

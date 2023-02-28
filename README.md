@@ -15,7 +15,8 @@ Documentation starts here:
 | POST       | /register                 | Register new user                   |
 | POST       | /login                    | Login or create new user            |
 | GET        | /\<username\>/home        | User home page                      |
-| GET        | /\<username\>/groups      | List all of the user's groups       |
+| GET        | /\<username\>/groups      | List user's groups                  |
+| GET        | /\<username\>/open-votes  | List user's events with open voting |
 | POST       | /new/group                | Create a new group                  |
 | GET        | /group/\<group_id\>       | Group home page                     |
 | PATCH      | /group/\<group_id\>       | Edit group home page                |
@@ -182,6 +183,43 @@ GET /<username>/groups
 				"activity_list": []
 			}
 		]
+	}
+]
+```
+
+## List a user's events that are still open for voting
+
+### request
+
+```txt
+GET /<username>/open-votes
+```
+
+### response
+
+```json
+200 OK
+
+[
+	{
+		"id": 18,
+		"title": "Weekend event",
+		"voting": true,
+		"date": "2023-02-24T00:00:00Z",
+		"activity_list": [],
+		"group": "Saturday night",
+		"vote_closing_time": "2023-02-27T10:48:00Z",
+		"decided": false
+	},
+	{
+		"id": 20,
+		"title": "Friday night hang?",
+		"voting": true,
+		"date": "2023-03-03T23:00:00Z",
+		"activity_list": [],
+		"group": "Saturday night",
+		"vote_closing_time": "2023-03-03T23:00:00Z",
+		"decided": false
 	}
 ]
 ```
