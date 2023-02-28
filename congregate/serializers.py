@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
-from .models import User, CongregateUser, Group, Event, Activity, Vote
+from .models import CongregateUser, Group, Event, Activity, Vote
 
 
 class VoteSerializer(ModelSerializer):
