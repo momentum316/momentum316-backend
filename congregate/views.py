@@ -1,19 +1,11 @@
-from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
-from dj_rest_auth.views import APIView
 from .models import CongregateUser, Group, Event, Activity, Vote
 from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer, DecidedEventSerializer
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
-from rest_framework.response import Response
 import json
-import random
-import string
 from rest_framework.authtoken.models import Token
 
 # Create your views here.
@@ -30,7 +22,7 @@ def logintest(request):
 
 
 @csrf_exempt
-def logintest2(request):
+def GoogleLogin(request):
     data = json.loads(request.body)
     email = data.get('email', None)
 
@@ -53,10 +45,6 @@ def logintest2(request):
     return JsonResponse({'error': 'Invalid credentials'}, status=401)
 
 
-def testview(request):
-    return render(request, 'test.html', {})
-
-
 @csrf_exempt
 def new_user(request):
     if request.method == 'POST':
@@ -71,7 +59,6 @@ def new_user(request):
             return JsonResponse({'error': 'username, first_name, last_name, and email are required fields'}, status=400)
 
         # Authenticate user with email
-        breakpoint()
         user = authenticate(request, email=email)
         if user is not None:
             login(request, user)
@@ -89,28 +76,6 @@ def new_user(request):
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
-
-
-class GoogleLoginView(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    # callback_url = 'http://localhost:3000/callback/'
-    # client_class = OAuth2Client
-
-    def post(self, request, *args, **kwargs):
-        self.request = request
-        self.serializer = self.get_serializer(data=self.request.data)
-        self.serializer.is_valid(raise_exception=True)
-        self.login()
-        response_data = self.get_response()
-        return Response(response_data)
-
-    def get_response(self):
-        response_data = {
-            'key': self.token.key,
-            'access_token': self.adapter.access_token,
-            # 'refresh_token': self.adapter.refresh_token
-        }
-        return response_data
 
 
 class UserHome(RetrieveUpdateAPIView):

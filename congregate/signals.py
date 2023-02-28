@@ -1,1 +1,0 @@
-allauth.socialaccount.signals.pre_social_login(request, sociallogin)

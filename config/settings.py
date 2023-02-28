@@ -205,14 +205,6 @@ del DATABASES['default']['OPTIONS']['sslmode']
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
 GOOGLE_SECRET_KEY = env('GOOGLE_SECRET_KEY')
 
-REST_AUTH_REGISTER_SERIALIZER = {
-    'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer'
-}
-
-REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'congregate.serializers.UserDetailsSerializer',
-}
-
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
