@@ -59,6 +59,7 @@ def GoogleLogin(request):
             user.last_name = last_name
         if avatar is not None:
             user.avatarURL = avatar
+        user.save()
         login(request, user, backend='config.auth_backend.EmailBackend')
 
         token, created = Token.objects.get_or_create(user=user)
