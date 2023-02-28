@@ -178,6 +178,7 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = [
+    'config.auth_backend.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
@@ -204,6 +205,13 @@ del DATABASES['default']['OPTIONS']['sslmode']
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
 GOOGLE_SECRET_KEY = env('GOOGLE_SECRET_KEY')
 
+REST_AUTH_REGISTER_SERIALIZER = {
+    'REGISTER_SERIALIZER': 'dj_rest_auth.registration.serializers.RegisterSerializer'
+}
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'congregate.serializers.UserDetailsSerializer',
+}
 
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True

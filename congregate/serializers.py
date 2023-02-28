@@ -1,11 +1,10 @@
 from django.db.models import Sum
-from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from .models import CongregateUser, Group, Event, Activity, Vote
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
+from .models import User, CongregateUser, Group, Event, Activity, Vote
 
 
 class VoteSerializer(ModelSerializer):
-    activity = serializers.SlugRelatedField(slug_field='title', read_only=True)
+    activity = SlugRelatedField(slug_field='title', read_only=True)
 
     class Meta:
         model = Vote
@@ -18,7 +17,7 @@ class VoteSerializer(ModelSerializer):
 
 
 class ActivitySerializer(ModelSerializer):
-    creator = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    creator = SlugRelatedField(slug_field='username', read_only=True)
     total_votes = SerializerMethodField('get_total_votes')
 
     def get_total_votes(self, obj):
@@ -40,8 +39,13 @@ class ActivitySerializer(ModelSerializer):
 
 
 class EventSerializer(ModelSerializer):
-    group = serializers.SlugRelatedField(slug_field='title', read_only=True)
-    activity_list = ActivitySerializer(many=True, source='activities', read_only=True)
+    group = SlugRelatedField(slug_field='title', read_only=True)
+    activity_list = SerializerMethodField()
+
+    def get_activity_list(self, obj):
+        activities = obj.activities.distinct()
+        serializer = ActivitySerializer(instance=activities, many=True)
+        return serializer.data
 
     class Meta:
         model = Event
@@ -58,7 +62,7 @@ class EventSerializer(ModelSerializer):
 
 
 class DecidedEventSerializer(ModelSerializer):
-    group = serializers.SlugRelatedField(slug_field='title', read_only=True)
+    group = SlugRelatedField(slug_field='title', read_only=True)
     activity_list = SerializerMethodField('get_activity_list')
 
     def get_activity_list(self, obj):
@@ -81,8 +85,8 @@ class DecidedEventSerializer(ModelSerializer):
 
 
 class GroupSerializer(ModelSerializer):
-    members = serializers.SlugRelatedField(slug_field='username', many=True, read_only=True)
-    admin = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    members = SlugRelatedField(slug_field='username', many=True, read_only=True)
+    admin = SlugRelatedField(slug_field='username', read_only=True)
     event_list = EventSerializer(many=True, source='events', read_only=True)
 
     class Meta:
@@ -110,3 +114,10 @@ class CongregateUserSerializer(ModelSerializer):
             'avatar',
             'group_list',
         )
+
+
+class UserSerializer(ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = '__all__'
