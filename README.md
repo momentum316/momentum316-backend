@@ -15,6 +15,8 @@ Documentation starts here:
 | POST       | /register                 | Register new user                   |
 | POST       | /login                    | Login or create new user            |
 | GET        | /\<username\>/home        | User home page                      |
+| PATCH      | /\<username\>/home        | User edits own attributes           |
+| GET        | /\<username\>/profile     | View another user's profile         |
 | GET        | /\<username\>/groups      | List user's groups                  |
 | GET        | /\<username\>/open-votes  | List user's events with open voting |
 | POST       | /new/group                | Create a new group                  |
