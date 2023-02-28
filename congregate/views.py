@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 import json
+import random
 
 # Create your views here.
 
@@ -31,8 +32,8 @@ def GoogleLogin(request):
     last_name = data.get('last_name', None)
     avatar = data.get('avatar', None)
 
-    user = authenticate(request, username=email)
-    if user is not None:
+    if User.objects.filter(email=email).exists():
+        user = authenticate(request, username=email)
         login(request, user)
 
         token, created = Token.objects.get_or_create(user=user)
@@ -50,16 +51,26 @@ def GoogleLogin(request):
         response_data['token'] = token.key
         return JsonResponse(response_data)
     else:
-        user = User.objects.create(email=email)
-        if username is not None:
-            user.username = username
+        if username is None:
+            random_num = random.randint(1, 99999)
+            username = 'Congregate' + str(random_num)
+
+        i = 1
+        while User.objects.filter(username=username).exists():
+            new_name = f'{username}{i}'
+            i += 1
+            username = new_name
+
+        user = User.objects.create(username=username, email=email)
+
         if first_name is not None:
             user.first_name = first_name
         if last_name is not None:
             user.last_name = last_name
         if avatar is not None:
             user.avatarURL = avatar
-        user.save()
+        
+        user = authenticate(request, username=email)
         login(request, user, backend='config.auth_backend.EmailBackend')
 
         token, created = Token.objects.get_or_create(user=user)

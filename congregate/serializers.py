@@ -18,9 +18,9 @@ class VoteSerializer(ModelSerializer):
 
 class ActivitySerializer(ModelSerializer):
     creator = SlugRelatedField(slug_field='username', read_only=True)
-    total_votes = SerializerMethodField('get_total_votes')
+    total_votes = SerializerMethodField('get_votes_tally')
 
-    def get_total_votes(self, obj):
+    def get_votes_tally(self, obj):
         return obj.votes.aggregate(total_votes=Sum('vote'))['total_votes']
 
     class Meta:
