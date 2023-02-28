@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
-from .models import CongregateUser, Group, Event, Activity, Vote
+from .models import User, Group, Event, Activity, Vote
 
 
 class VoteSerializer(ModelSerializer):
@@ -100,17 +100,17 @@ class GroupSerializer(ModelSerializer):
         )
 
 
-class CongregateUserSerializer(ModelSerializer):
+class UserSerializer(ModelSerializer):
     group_list = GroupSerializer(many=True, source='user_groups', read_only=True)
 
     class Meta:
-        model = CongregateUser
+        model = User
         fields = (
             'id',
             'username',
             'first_name',
             'last_name',
             'email',
-            'avatar',
+            'avatarURL',
             'group_list',
         )

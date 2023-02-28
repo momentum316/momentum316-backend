@@ -2,11 +2,12 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from .models import User, CongregateUser, Group, Event, Activity, Vote
-from .serializers import CongregateUserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer, DecidedEventSerializer
-from rest_framework.generics import RetrieveAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
-import json
+from .models import User, Group, Event, Activity, Vote
+from .serializers import UserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer, DecidedEventSerializer
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import RetrieveAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.response import Response
+import json
 
 # Create your views here.
 
@@ -25,8 +26,10 @@ def logintest(request):
 def GoogleLogin(request):
     data = json.loads(request.body)
     email = data.get('email', None)
+    username = data.get('username', None)
     first_name = data.get('first_name', None)
     last_name = data.get('last_name', None)
+    avatar = data.get('avatar', None)
 
     user = authenticate(request, username=email)
     if user is not None:
@@ -37,19 +40,25 @@ def GoogleLogin(request):
         response_data = {
             'user': {
                 'id': str(user.id),
+                'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
+                'avatar': user.avatarURL
             },
         }
         response_data['token'] = token.key
         return JsonResponse(response_data)
     else:
-        user = User.objects.create(username=email, email=email)
+        user = User.objects.create(email=email)
+        if username is not None:
+            user.username = username
         if first_name is not None:
             user.first_name = first_name
         if last_name is not None:
             user.last_name = last_name
+        if avatar is not None:
+            user.avatarURL = avatar
         login(request, user, backend='config.auth_backend.EmailBackend')
 
         token, created = Token.objects.get_or_create(user=user)
@@ -58,8 +67,10 @@ def GoogleLogin(request):
             'user': {
                 'id': str(user.id),
                 'email': user.email,
+                'username': user.username,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
+                'avatar': user.avatarURL
             },
         }
         response_data['token'] = token.key
@@ -86,11 +97,11 @@ def new_user(request):
             return redirect(f'/{user.username}/home/', status=302)
 
         # Check if the user already exists
-        if CongregateUser.objects.filter(username=username).exists():
+        if User.objects.filter(username=username).exists():
             return JsonResponse({'error': 'user with this username already exists'}, status=409)
 
         # Create and save the new user
-        user = CongregateUser.objects.create(username=email, first_name=first_name, last_name=last_name, email=email)
+        user = User.objects.create(username=email, first_name=first_name, last_name=last_name, email=email)
         user.save()
 
         return redirect(f'/{user.email}/home/', status=201)
@@ -100,20 +111,36 @@ def new_user(request):
 
 
 class UserHome(RetrieveUpdateAPIView):
-    queryset = CongregateUser.objects.all()
-    serializer_class = CongregateUserSerializer
-    lookup_url_kwarg = 'username'
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
+    # need to fix permissions
+
+
+class UserProfile(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
     lookup_field = 'username'
 
 
 class UserOpenVote(ListAPIView):
     serializer_class = EventSerializer
-    lookup_url_kwarg = 'username'
 
     def get_queryset(self):
-        user = get_object_or_404(CongregateUser, username=self.kwargs['username'])
+        breakpoint()
+        user = get_object_or_404(User, username=self.request.user)
         group_ids = user.user_groups.values_list('id', flat=True)
         return Event.objects.filter(group__id__in=group_ids, voting=True, decided=False).exclude(event_voter=user)
+
+
+class CreateGroup(CreateAPIView):
+    serializer_class = GroupSerializer
+
+    def perform_create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(admin=self.request.user)
+        return Response(serializer.data, status=201)
 
 
 @csrf_exempt
@@ -121,7 +148,7 @@ def create_group_view(request):
     data = json.loads(request.body)
     username = data.get('username', None)
     title = data.get('title', None)
-    user = get_object_or_404(CongregateUser, username=username)
+    user = get_object_or_404(User, username=username)
 
     group = Group.objects.create(title=title, admin=user)
     group.members.add(user)
@@ -136,7 +163,7 @@ class UserGroup(ListAPIView):
     lookup_url_kwarg = 'username'
 
     def get_queryset(self):
-        user = get_object_or_404(CongregateUser, username=self.kwargs['username'])
+        user = get_object_or_404(User, username=self.kwargs['username'])
         return user.user_groups.all()
 
 
@@ -192,7 +219,7 @@ def add_user_group(request):
         group_id = data.get('group_id', None)
 
         # Look up user and group
-        user = CongregateUser.objects.get(username=username)
+        user = User.objects.get(username=username)
         group = Group.objects.get(id=group_id)
 
         # Check if user is already a member of the group
@@ -224,7 +251,7 @@ def new_activity(request):
         end_time = data.get('end_time', None)
 
         # Create and save the new event
-        creator = CongregateUser.objects.get(username=username)
+        creator = User.objects.get(username=username)
         event = Event.objects.get(id=event_id)
         activity = Activity.objects.create(title=title, event=event, creator=creator, description=description, start_time=start_time, end_time=end_time)
         activity.save()
@@ -271,7 +298,7 @@ def submit_vote(request):
         event_id = data.get('event_id', None)
 
         # Look up user and event
-        user = CongregateUser.objects.get(username=username)
+        user = User.objects.get(username=username)
         event = Event.objects.get(id=event_id)
 
         # Check if user has already submitted votes
