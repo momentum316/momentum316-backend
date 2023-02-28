@@ -141,7 +141,6 @@ class UserOpenVote(ListAPIView):
     serializer_class = EventSerializer
 
     def get_queryset(self):
-        breakpoint()
         user = get_object_or_404(User, username=self.request.user)
         group_ids = user.user_groups.values_list('id', flat=True)
         return Event.objects.filter(group__id__in=group_ids, voting=True, decided=False).exclude(event_voter=user)
