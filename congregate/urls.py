@@ -16,5 +16,4 @@ urlpatterns = [
     path('activity/<int:activity_id>', views.ActivityUpdate.as_view(), name='activity_update'),
     path('vote/<int:vote_id>', views.Voting.as_view(), name='vote'),
     path('submit-vote/', views.submit_vote, name='submit_vote'),
-    path('event-winner/<event_id>', views.DecideEvent.as_view(), name='event_winner'),
 ]
