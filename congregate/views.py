@@ -2,10 +2,10 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from .models import User, Group, Event, Activity, Vote
-from .serializers import UserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, VoteSerializer, DecidedEventSerializer
+from .models import User, Group, Event, Activity, PendingActivity, Vote
+from .serializers import UserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, PendingActivitySerializer, VoteSerializer
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import RetrieveAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 import json
 import random
@@ -363,3 +363,23 @@ def submit_vote(request):
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
+
+
+class CreatePendingActivity(CreateAPIView):
+    serializer_class = PendingActivitySerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(creator=self.request.user)
+        return Response(serializer.data, status=201)
+
+
+class PendingActivityUpdate(RetrieveUpdateDestroyAPIView):
+    queryset = PendingActivity.objects.all()
+    serializer_class = PendingActivitySerializer
+    lookup_url_kwarg = 'pending_activity_id'
+
+    def get_queryset(self):
+        queryset = PendingActivity.objects.filter(id=self.kwargs['pending_activity_id'])
+        return queryset

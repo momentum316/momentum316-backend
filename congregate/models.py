@@ -61,12 +61,25 @@ class Event(models.Model):
 class Activity(models.Model):
     title = models.CharField(max_length=255)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='activities')
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activities', null=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activities')
     description = models.TextField()
     location = models.TextField(null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     attendees = models.ManyToManyField(User, related_name='attending_activities', blank=True)
+
+    def __str__(self):
+        return self.title
+
+
+class PendingActivity(models.Model):
+    title = models.CharField(max_length=255)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pending_activities')
+    description = models.TextField()
+    location = models.TextField(null=True)
+    start_time = models.DateTimeField(null=True)
+    end_time = models.DateTimeField(null=True)
+    image = models.URLField(null=True)
 
     def __str__(self):
         return self.title
