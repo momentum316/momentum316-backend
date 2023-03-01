@@ -10,29 +10,28 @@ Documentation starts here:
 
 ### API ENDPOINTS
 
-| HTTP Verbs | Endpoints                 | Action                              |
-| ---------- | ------------------------- | ----------------------------------- |
-| POST       | /register                 | Register new user                   |
-| POST       | /login                    | Login or create new user            |
-| GET        | /\<username\>/home        | User home page                      |
-| PATCH      | /\<username\>/home        | User edits own attributes           |
-| GET        | /\<username\>/profile     | View another user's profile         |
-| GET        | /\<username\>/groups      | List user's groups                  |
-| GET        | /\<username\>/open-votes  | List user's events with open voting |
-| POST       | /new/group                | Create a new group                  |
-| GET        | /group/\<group_id\>       | Group home page                     |
-| PATCH      | /group/\<group_id\>       | Edit group home page                |
-| POST       | /add-user-group           | Join a user to the group            |
-| POST       | /new/event                | Create a new event for the group    |
-| GET        | /event/\<event_id\>       | Event home page                     |
-| PATCH      | /event/\<event_id\>       | Update an event                     |
-| DELETE     | /event/\<event_id\>       | Delete an event                     |
-| POST       | /new/activity             | Create a new activity for the event |
-| GET        | /activity/\<activity_id\> | Activity home page                  |
-| PATCH      | /activity/\<activity_id\> | Update an activity                  |
-| DELETE     | /activity/\<activity_id\> | Delete an activity                  |
-| PATCH      | /vote/\<vote_id\>         | User can change vote                |
-| POST       | /submit-vote/             | User submits votes for an event     |
+| HTTP Verbs | Endpoints                 | Action                                  |
+| ---------- | ------------------------- | --------------------------------------- |
+| POST       | /register                 | Register new user                       |
+| POST       | /login                    | Login or create new user                |
+| GET        | /\<username\>/home        | User home page                          |
+| PATCH      | /\<username\>/home        | User edits own attributes               |
+| GET        | /\<username\>/profile     | View another user's profile             |
+| GET        | /\<username\>/groups      | List user's groups                      |
+| GET        | /\<username\>/open-votes  | List user's events with open voting     |
+| POST       | /new/group                | Create a new group                      |
+| GET        | /group/\<group_id\>       | Group home page                         |
+| PATCH      | /group/\<group_id\>       | Edit group home page, add user to group |
+| POST       | /new/event                | Create a new event for the group        |
+| GET        | /event/\<event_id\>       | Event home page                         |
+| PATCH      | /event/\<event_id\>       | Update an event                         |
+| DELETE     | /event/\<event_id\>       | Delete an event                         |
+| POST       | /new/activity             | Create a new activity for the event     |
+| GET        | /activity/\<activity_id\> | Activity home page                      |
+| PATCH      | /activity/\<activity_id\> | Update an activity                      |
+| DELETE     | /activity/\<activity_id\> | Delete an activity                      |
+| PATCH      | /vote/\<vote_id\>         | User can change vote                    |
+| POST       | /submit-vote/             | User submits votes for an event         |
 
 ## Register a new user
 
@@ -228,7 +227,7 @@ GET /<username>/open-votes
 
 ## Create a new group
 
-Requires group title and the username of the user creating the group
+Requires authentication token and group title in request body
 
 ### request
 
@@ -238,8 +237,7 @@ POST new/group/
 
 ```json
 {
-  "title": "Another awesome group",
-  "username": "jcox"
+  "title": "Another awesome group"
 }
 ```
 
@@ -251,7 +249,8 @@ POST new/group/
 {
 	"group": {
 		"id": 9,
-		"title": "Another awesome group"
+		"title": "Another awesome group",
+		"admin": "jcox"
 	}
 }
 ```
@@ -343,13 +342,12 @@ PATCH /group/<group_id>/
 ### request
 
 ```txt
-POST /add-user-group/
+PATCH /group/<group_id>/
 ```
 
 ```json
 {
-  "username": "jcox",
-  "group_id": 3
+  "username": "sammy"
 }
 ```
 
@@ -360,11 +358,13 @@ POST /add-user-group/
 
 {
 	"id": 3,
-	"title": "Just OK Group",
+	"title": "Edited Group Title",
 	"members": [
 		"jcox",
 		"testuser1",
-		"justcapel"
+		"justcapel",
+		"sammy"
+
 	],
 	"admin": "justcapel",
 	"event_list": [
@@ -372,9 +372,10 @@ POST /add-user-group/
 			"id": 3,
 			"title": "This weekend",
 			"voting": true,
-			"start_time": "2023-02-23T06:14:53.955409Z",
-			"vote_closing_time": "2023-02-23T06:14:53.955425Z",
-			"group": 3
+			"date": "2023-02-23",
+			"activity_list": [],
+			"group": "Edited Group Title",
+			"vote_closing_time": "2023-02-23T06:14:53.955425Z"
 		}
 	]
 }

@@ -149,25 +149,12 @@ class UserOpenVote(ListAPIView):
 class CreateGroup(CreateAPIView):
     serializer_class = GroupSerializer
 
-    def perform_create(self, request):
+    def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(admin=self.request.user)
+        group = serializer.save(admin=self.request.user)
+        group.members.add(self.request.user)
         return Response(serializer.data, status=201)
-
-
-@csrf_exempt
-def create_group_view(request):
-    data = json.loads(request.body)
-    username = data.get('username', None)
-    title = data.get('title', None)
-    user = get_object_or_404(User, username=username)
-
-    group = Group.objects.create(title=title, admin=user)
-    group.members.add(user)
-    group.save()
-
-    return JsonResponse({'group': {'id': group.id, 'title': group.title}}, status=201)
 
 
 class UserGroup(ListAPIView):
@@ -185,8 +172,17 @@ class GroupHome(RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = 'group_id'
 
     def get_queryset(self):
-        queryset = Group.objects.filter(id=self.kwargs['group_id'])
-        return queryset
+        return Group.objects.filter(id=self.kwargs['group_id'])
+
+    def partial_update(self, request, *args, **kwargs):
+        group = self.get_object()
+        if 'username' in request.data:
+            user = User.objects.get(username=request.data['username'])
+            group.members.add(user)
+        serializer = self.get_serializer(group, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class EventHome(RetrieveUpdateDestroyAPIView):
