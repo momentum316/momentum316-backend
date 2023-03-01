@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
-from .models import User, Group, Event, Activity, Vote
+from .models import User, Group, Event, Activity, PendingActivity, Vote
 
 
 class VoteSerializer(ModelSerializer):
@@ -14,6 +14,14 @@ class VoteSerializer(ModelSerializer):
             'activity',
             'vote',
         )
+
+
+class PendingActivitySerializer(ModelSerializer):
+    creator = SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = PendingActivity
+        fields = '__all__'
 
 
 class ActivitySerializer(ModelSerializer):
@@ -106,6 +114,7 @@ class GroupSerializer(ModelSerializer):
 
 class UserSerializer(ModelSerializer):
     group_list = GroupSerializer(many=True, source='user_groups', read_only=True)
+    pending_activities = SlugRelatedField(slug_field='title', many=True, read_only=True)
 
     class Meta:
         model = User
@@ -116,5 +125,6 @@ class UserSerializer(ModelSerializer):
             'last_name',
             'email',
             'avatarURL',
+            'pending_activities',
             'group_list',
         )
