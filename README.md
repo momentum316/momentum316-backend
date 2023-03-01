@@ -77,7 +77,10 @@ POST /login
 
 ```json
 {
-  "email": "fakeemail@gmail.com"
+  "email": "fakeemail@gmail.com",
+  "username": "fakeyfake",
+  "first_name": "Fake",
+  "last_name": "Email"
 }
 ```
 
@@ -89,7 +92,11 @@ POST /login
 {
 	"user": {
 		"id": "6",
-		"email": "fakeemail@gmail.com"
+		"email": "fakeemail@gmail.com",
+		"username": "fakeyfake",
+		"first_name": "Fake",
+		"last_name": "Email",
+		"avatar": null
 	},
 	"token": "y22833c083d494b7c2683f53457376d7d8379a40"
 }
@@ -312,6 +319,14 @@ PATCH /group/<group_id>/
 ```
 
 ```json
+{
+  "title": "Edited Group Title"
+}
+```
+
+### response
+
+```json
 200 OK
 
 {
@@ -340,6 +355,8 @@ PATCH /group/<group_id>/
 ## Join a user to the group
 
 ### request
+
+Requires authentication as well as the username in the request body
 
 ```txt
 PATCH /group/<group_id>/
@@ -395,7 +412,7 @@ PATCH /group/<group_id>/
 
 ### request
 
-Requires event title, group_id, voting (T/F), date, and vote_closing_time
+Requires authentication as well as event title, group_id, voting (T/F), date, and vote_closing_time
 
 ```txt
 POST /new/event
@@ -421,8 +438,11 @@ POST /new/event
 		"id": 1,
 		"title": "Girls' Night Out!!",
 		"voting": true,
-		"date": "2023-02-24",
-		"vote_closing_time": "2023-02-25T20:02:13.000Z"
+		"date": "2023-02-26T23:00:00:000Z",
+		"activity_list": [],
+		"group": "Those Girls",
+		"vote_closing_time": "2023-02-25T20:02:13.000Z",
+		"decided": false
 	}
 }
 ```
@@ -445,11 +465,12 @@ GET /event/<event_id>
 {
 	"id": 3,
 	"title": "This weekend",
-	"group": "Just OK Group",
 	"voting": true,
+	"group": "Just OK Group",
 	"start_time": "2023-02-23T06:14:53.955409Z",
 	"vote_closing_time": "2023-02-23T06:14:53.955425Z",
-	"activity_list": []
+	"activity_list": [],
+	"decided": false
 }
 ```
 
@@ -481,7 +502,8 @@ PATCH /group/<group_id>/
 	"date": "2023-02-23",
 	"activity_list": [],
 	"group": "Edited Group Title",
-	"vote_closing_time": "2023-02-23T06:14:53.955425Z"
+	"vote_closing_time": "2023-02-23T06:14:53.955425Z",
+	"decided": false
 }
 ```
 
@@ -503,7 +525,7 @@ DELETE /event/<event_id>/
 
 ### request
 
-Requires title, event_id, start_time, end_time, and description
+Requires authentication and title, event_id, start_time, end_time, and description
 
 ```txt
 POST /new/activity/

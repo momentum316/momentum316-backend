@@ -12,16 +12,6 @@ import random
 
 # Create your views here.
 
-@csrf_exempt
-def logintest(request):
-    data = json.loads(request.body)
-    email = data.get('email', None)
-
-    user = authenticate(request, username=email)
-    if user is not None:
-        login(request, user)
-        return user
-
 
 @csrf_exempt
 def GoogleLogin(request):
@@ -90,7 +80,9 @@ def GoogleLogin(request):
         response_data['token'] = token.key
         return JsonResponse(response_data)
 
-
+'''
+no longer need, will wait for any bug reports from front end
+'''
 @csrf_exempt
 def new_user(request):
     if request.method == 'POST':
@@ -195,10 +187,12 @@ class EventHome(RetrieveUpdateDestroyAPIView):
         return EventSerializer
 
     def get_queryset(self):
-        queryset = Event.objects.filter(id=self.kwargs['event_id'])
-        return queryset
+        return Event.objects.filter(id=self.kwargs['event_id'])
 
 
+'''
+no longer needed, will wait for any bug reports from front end
+'''
 @csrf_exempt
 def new_event(request):
     if request.method == 'POST':
@@ -220,7 +214,21 @@ def new_event(request):
         return JsonResponse({'error': 'invalid request method'}, status=405)
 
 
-@csrf_exempt
+class CreateEvent(CreateAPIView):
+    serializer_class = EventSerializer
+    lookup_url_kwarg = 'group_id'
+
+    def post(self, request):
+        group = Group.objects.get(id=request.data.get('group_id'))
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(group=group)
+        return Response(serializer.data, status=201)
+
+
+'''
+no longer needed, will wait for any bug reports from front end
+'''
 def add_user_group(request):
     if request.method == 'POST':
         data = json.loads(request.body)
