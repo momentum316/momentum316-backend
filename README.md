@@ -511,6 +511,8 @@ PATCH /group/<group_id>/
 
 ### request
 
+Requires authentication
+
 ```txt
 DELETE /event/<event_id>/
 ```
@@ -551,10 +553,12 @@ POST /new/activity/
   "activity": {
     "id": 3,
     "title": "Left-handed bowling night",
+		"creator": "jcox",
     "description": "You must use your left hand to bowl!",
 		"location": "Uptown Bowling",
     "start_time": "2023-02-24T06:14:53.955425Z",
-    "end_time": "2023-02-24T09:14:53.955425Z"
+    "end_time": "2023-02-24T09:14:53.955425Z",
+		"total_votes": 0
   }
 }
 ```
@@ -584,9 +588,11 @@ POST /activity/<activity_id>
   "activity": {
     "id": 3,
     "title": "Bowling night!",
+		"creator": "jcox",
     "description": "You must use your left hand to bowl!",
     "start_time": "2023-02-24T06:14:53.955425Z",
-    "end_time": "2023-02-24T09:14:53.955425Z"
+    "end_time": "2023-02-24T09:14:53.955425Z",
+		"total_votes": 0
   }
 }
 ```
@@ -594,6 +600,8 @@ POST /activity/<activity_id>
 ## Delete an activity
 
 ### request
+
+Requires authentication
 
 ```txt
 DELETE /activity/<activity_id>/

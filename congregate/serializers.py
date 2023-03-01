@@ -17,6 +17,7 @@ class VoteSerializer(ModelSerializer):
 
 
 class ActivitySerializer(ModelSerializer):
+    event = SlugRelatedField(slug_field='title', read_only=True)
     creator = SlugRelatedField(slug_field='username', read_only=True)
     total_votes = SerializerMethodField('get_votes_tally')
 

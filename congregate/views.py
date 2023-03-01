@@ -178,13 +178,8 @@ class GroupHome(RetrieveUpdateDestroyAPIView):
 
 
 class EventHome(RetrieveUpdateDestroyAPIView):
+    serializer_class = EventSerializer
     lookup_url_kwarg = 'event_id'
-
-    def get_serializer_class(self):
-        event = self.get_object()
-        if event.decided:
-            return DecidedEventSerializer
-        return EventSerializer
 
     def get_queryset(self):
         return Event.objects.filter(id=self.kwargs['event_id'])
@@ -216,7 +211,6 @@ def new_event(request):
 
 class CreateEvent(CreateAPIView):
     serializer_class = EventSerializer
-    lookup_url_kwarg = 'group_id'
 
     def post(self, request):
         group = Group.objects.get(id=request.data.get('group_id'))
@@ -256,6 +250,9 @@ def add_user_group(request):
         return JsonResponse({'error': 'invalid request method'}, status=405)
 
 
+'''
+no longer needed, will wait for any bug reports from front end
+'''
 @csrf_exempt
 def new_activity(request):
     if request.method == 'POST':
@@ -282,6 +279,23 @@ def new_activity(request):
 
     else:
         return JsonResponse({'error': 'invalid request method'}, status=405)
+
+
+class CreateActivity(CreateAPIView):
+    serializer_class = ActivitySerializer
+
+    def post(self, request):
+        event = Event.objects.get(id=request.data.get('event_id'))
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        activity = serializer.save(event=event, creator=request.user)
+
+        group = event.group
+        for member in group.members.all():
+            vote = Vote.objects.create(voter=member, activity=activity)
+            vote.save()
+
+        return Response(serializer.data, status=201)
 
 
 class ActivityUpdate(RetrieveUpdateDestroyAPIView):
