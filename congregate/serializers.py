@@ -20,6 +20,7 @@ class ActivitySerializer(ModelSerializer):
     event = SlugRelatedField(slug_field='title', read_only=True)
     creator = SlugRelatedField(slug_field='username', read_only=True)
     total_votes = SerializerMethodField('get_votes_tally')
+    attendees = SlugRelatedField(slug_field='username', many=True, read_only=True)
 
     def get_votes_tally(self, obj):
         return obj.votes.aggregate(total_votes=Sum('vote'))['total_votes']
@@ -36,6 +37,7 @@ class ActivitySerializer(ModelSerializer):
             'start_time',
             'end_time',
             'total_votes',
+            'attendees',
         )
 
 
@@ -62,6 +64,7 @@ class EventSerializer(ModelSerializer):
         )
 
 
+# Is this necessary?
 class DecidedEventSerializer(ModelSerializer):
     group = SlugRelatedField(slug_field='title', read_only=True)
     activity_list = SerializerMethodField('get_activity_list')
