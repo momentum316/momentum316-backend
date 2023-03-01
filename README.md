@@ -10,28 +10,32 @@ Documentation starts here:
 
 ### API ENDPOINTS
 
-| HTTP Verbs | Endpoints                 | Action                                  |
-| ---------- | ------------------------- | --------------------------------------- |
-| POST       | /register                 | Register new user                       |
-| POST       | /login                    | Login or create new user                |
-| GET        | /\<username\>/home        | User home page                          |
-| PATCH      | /\<username\>/home        | User edits own attributes               |
-| GET        | /\<username\>/profile     | View another user's profile             |
-| GET        | /\<username\>/groups      | List user's groups                      |
-| GET        | /\<username\>/open-votes  | List user's events with open voting     |
-| POST       | /new/group                | Create a new group                      |
-| GET        | /group/\<group_id\>       | Group home page                         |
-| PATCH      | /group/\<group_id\>       | Edit group home page, add user to group |
-| POST       | /new/event                | Create a new event for the group        |
-| GET        | /event/\<event_id\>       | Event home page                         |
-| PATCH      | /event/\<event_id\>       | Update an event                         |
-| DELETE     | /event/\<event_id\>       | Delete an event                         |
-| POST       | /new/activity             | Create a new activity for the event     |
-| GET        | /activity/\<activity_id\> | Activity home page                      |
-| PATCH      | /activity/\<activity_id\> | Update an activity                      |
-| DELETE     | /activity/\<activity_id\> | Delete an activity                      |
-| PATCH      | /vote/\<vote_id\>         | User can change vote                    |
-| POST       | /submit-vote/             | User submits votes for an event         |
+| HTTP Verbs | Endpoints                          | Action                                     |
+| ---------- | ---------------------------------- | ------------------------------------------ |
+| POST       | /register                          | Register new user                          |
+| POST       | /login                             | Login or create new user                   |
+| GET        | /\<username\>/home                 | User home page                             |
+| PATCH      | /\<username\>/home                 | User edits own attributes                  |
+| GET        | /\<username\>/profile              | View another user's profile                |
+| GET        | /\<username\>/groups               | List user's groups                         |
+| GET        | /\<username\>/open-votes           | List user's events with open voting        |
+| POST       | /new/group                         | Create a new group                         |
+| GET        | /group/\<group_id\>                | Group home page                            |
+| PATCH      | /group/\<group_id\>                | Edit group home page, add user to group    |
+| POST       | /new/event                         | Create a new event for the group           |
+| GET        | /event/\<event_id\>                | Event home page                            |
+| PATCH      | /event/\<event_id\>                | Update an event                            |
+| DELETE     | /event/\<event_id\>                | Delete an event                            |
+| POST       | /new/activity                      | Create a new activity for the event        |
+| GET        | /activity/\<activity_id\>          | Activity home page                         |
+| PATCH      | /activity/\<activity_id\>          | Update an activity                         |
+| DELETE     | /activity/\<activity_id\>          | Delete an activity                         |
+| PATCH      | /vote/\<vote_id\>                  | User can change vote                       |
+| POST       | /submit-vote/                      | User submits votes for an event            |
+| POST       | /new/pending-activity              | Create a new pending activity for the user |
+| GET        | /pending/<int:pending_activity_id> | Get pending activity                       |
+| PATCH      | /pending/<int:pending_activity_id> | Update a pending activity                  |
+| DELETE     | /pending/<int:pending_activity_id> | Delete a pending activity                  |
 
 ## Register a new user
 
@@ -742,4 +746,87 @@ POST /submit-vote/
 	"vote_closing_time": "2023-02-25T20:02:13Z",
 	"decided": true
 }
+```
+
+## Create a new pending activity for the user
+
+### request
+
+Requires authentication and title, description
+
+```txt
+POST /new/pending-activity/
+```
+
+```json
+{
+  "title": "Rock climbing",
+  "description": "Want to do this eventually"
+}
+```
+
+### response
+
+```json
+201 Created
+
+{
+	"id": 4,
+	"creator": "bob",
+	"title": "Rock climbing",
+	"description": "Want to do this eventually",
+	"location": null,
+	"start_time": null,
+	"end_time": null,
+	"image": null
+}
+```
+
+## Update a pending activity
+
+### request
+
+Requires authentication
+
+```txt
+POST /pending/<int:pending_activity_id>/
+```
+
+```json
+{
+  "location": "Them there mountains"
+}
+```
+
+### response
+
+```json
+200 OK
+
+{
+	"id": 4,
+	"creator": "bob",
+	"title": "Rock climbing",
+	"description": "Want to do this eventually",
+	"location": "Them there mountains",
+	"start_time": null,
+	"end_time": null,
+	"image": null
+}
+```
+
+## Delete an activity
+
+### request
+
+Requires authentication
+
+```txt
+DELETE /pending/<pending_activity_id>/
+```
+
+### response
+
+```json
+204 No Content
 ```
