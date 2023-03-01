@@ -558,7 +558,8 @@ POST /new/activity/
 		"location": "Uptown Bowling",
     "start_time": "2023-02-24T06:14:53.955425Z",
     "end_time": "2023-02-24T09:14:53.955425Z",
-		"total_votes": 0
+		"total_votes": 0,
+		"attendees": []
   }
 }
 ```
@@ -570,7 +571,7 @@ POST /new/activity/
 Requires authentication
 
 ```txt
-POST /activity/<activity_id>
+PATCH /activity/<activity_id>
 ```
 
 ```json
@@ -592,7 +593,44 @@ POST /activity/<activity_id>
     "description": "You must use your left hand to bowl!",
     "start_time": "2023-02-24T06:14:53.955425Z",
     "end_time": "2023-02-24T09:14:53.955425Z",
-		"total_votes": 0
+		"total_votes": 0,
+		"attendees": []
+  }
+}
+
+```
+
+## Add attendee to activity
+
+### request
+
+Requires authentication, username passed in request body
+
+```txt
+PATCH /activity/<activity_id>
+```
+
+```json
+{
+  "username": "bobuser"
+}
+```
+
+### response
+
+```json
+200 OK
+
+{
+  "activity": {
+    "id": 3,
+    "title": "Bowling night!",
+		"creator": "jcox",
+    "description": "You must use your left hand to bowl!",
+    "start_time": "2023-02-24T06:14:53.955425Z",
+    "end_time": "2023-02-24T09:14:53.955425Z",
+		"total_votes": 0,
+		"attendees": ["bobuser"]
   }
 }
 ```

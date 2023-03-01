@@ -307,6 +307,16 @@ class ActivityUpdate(RetrieveUpdateDestroyAPIView):
         queryset = Activity.objects.filter(id=self.kwargs['activity_id'])
         return queryset
 
+    def partial_update(self, request, *args, **kwargs):
+        activity = self.get_object()
+        if 'username' in request.data:
+            user = User.objects.get(username=request.data['username'])
+            activity.attendees.add(user)
+        serializer = self.get_serializer(activity, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
 
 class Voting(UpdateAPIView):
     queryset = Vote.objects.all()
