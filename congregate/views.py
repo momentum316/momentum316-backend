@@ -307,7 +307,7 @@ class ActivityUpdate(RetrieveUpdateDestroyAPIView):
         queryset = Activity.objects.filter(id=self.kwargs['activity_id'])
         return queryset
 
-    def partial_update(self, request, *args, **kwargs):
+    def partial_update(self, request):
         activity = self.get_object()
         if 'username' in request.data:
             user = User.objects.get(username=request.data['username'])
@@ -318,17 +318,13 @@ class ActivityUpdate(RetrieveUpdateDestroyAPIView):
         return Response(serializer.data)
 
 
-class Voting(UpdateAPIView):
+class Voting(RetrieveUpdateAPIView):
     queryset = Vote.objects.all()
     serializer_class = VoteSerializer
     lookup_url_kwarg = 'vote_id'
 
     def get_queryset(self):
-        vote = Vote.objects.get(id=self.kwargs['vote_id'])
-        if self.request.data.get('username') != vote.voter.username:
-            return redirect(self.request.META.get('HTTP_REFERER'))
-        queryset = Vote.objects.filter(id=self.kwargs['vote_id'])
-        return queryset
+        return Vote.objects.filter(id=self.kwargs['vote_id'])
 
 
 @csrf_exempt

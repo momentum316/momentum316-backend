@@ -5,6 +5,7 @@ from .models import User, Group, Event, Activity, PendingActivity, Vote
 
 class VoteSerializer(ModelSerializer):
     activity = SlugRelatedField(slug_field='title', read_only=True)
+    voter = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = Vote
