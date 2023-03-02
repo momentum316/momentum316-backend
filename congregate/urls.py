@@ -10,6 +10,7 @@ urlpatterns = [
     path('<username>/open-votes', views.UserOpenVote.as_view(), name='user_open_vote'),
     path('new/group/', views.CreateGroup.as_view(), name='new_group'),
     path('group/<int:group_id>', views.GroupHome.as_view(), name='group_home'),
+    path('leave/<int:group_id>', views.LeaveGroup.as_view(), name='leave_group'),
     path('new/event/', views.CreateEvent.as_view(), name='new_event'),
     path('event/<int:event_id>', views.EventHome.as_view(), name='event_home'),
     path('new/activity/', views.CreateActivity.as_view(), name='new_activity'),
