@@ -10,6 +10,9 @@ from rest_framework.response import Response
 import json
 import random
 
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
+from .custom_permissions import IsGroupMember
+
 # Create your views here.
 
 
@@ -120,6 +123,7 @@ class UserHome(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
+    permission_classes = [IsAuthenticated]
     # need to fix permissions
 
 
@@ -127,6 +131,7 @@ class UserProfile(ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
+    permission_classes = [IsAuthenticated]
 
 
 class UserOpenVote(ListAPIView):
@@ -140,6 +145,7 @@ class UserOpenVote(ListAPIView):
 
 class CreateGroup(CreateAPIView):
     serializer_class = GroupSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -162,6 +168,7 @@ class UserGroup(ListAPIView):
 class GroupHome(RetrieveUpdateDestroyAPIView):
     serializer_class = GroupSerializer
     lookup_url_kwarg = 'group_id'
+    permission_classes = [IsGroupMember]
 
     def get_queryset(self):
         return Group.objects.filter(id=self.kwargs['group_id'])
