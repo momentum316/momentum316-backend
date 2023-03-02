@@ -412,6 +412,31 @@ PATCH /group/<group_id>/
 }
 ```
 
+## Remove user from group
+
+### request
+
+Requires authentication as well as username in request
+
+```txt
+PATCH /leave/<group_id>
+```
+
+```json
+{
+  "username": "bobuser"
+}
+```
+
+### response
+
+```json
+200 OK
+{
+	"message": "bobuser has left the group"
+}
+```
+
 ## Create a new event for the group
 
 ### request
