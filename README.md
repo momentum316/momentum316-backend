@@ -485,7 +485,7 @@ GET /event/<event_id>
 Requires authentication
 
 ```txt
-PATCH /group/<group_id>/
+PATCH /event/<event_id>/
 ```
 
 ```json
@@ -667,7 +667,6 @@ PATCH /vote/<vote_id>/
 
 ```json
 {
-  "username": "jcox",
   "vote": 1
 }
 ```
@@ -679,13 +678,13 @@ PATCH /vote/<vote_id>/
 
 {
 	"id": 1,
-	"voter": 1,
+	"voter": "jcox",
 	"activity": "Vote activity",
 	"vote": 1
 }
 ```
 
-## User submits a vote
+## User submits votes for event
 
 ```txt
 POST /submit-vote/
@@ -815,7 +814,7 @@ POST /pending/<int:pending_activity_id>/
 }
 ```
 
-## Delete an activity
+## Delete a pending activity
 
 ### request
 

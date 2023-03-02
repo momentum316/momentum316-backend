@@ -92,3 +92,11 @@ class Vote(models.Model):
         default=0,
         validators=[MaxValueValidator(1), MinValueValidator(-1)]
     )
+
+
+class Upload(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploads')
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='uploads')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='uploads')
+    file = models.FileField(upload_to='media/', blank=True, null=True)
+    image = models.ImageField(upload_to='media/', blank=True, null=True)
