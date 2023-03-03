@@ -399,7 +399,7 @@ def submit_vote(request):
         group = event.group
 
         if group.members.count() <= event.event_voter.count():
-            event_acts = Activity.objects.filter(event=event).annotate(total_votes=Sum('votes__vote')).order_by('-total_votes')
+            event_acts = Activity.objects.filter(event=event).annotate(total_votes=Sum('votes__vote')).order_by('-total_votes', '?')
 
             winning_activity = event_acts[0]
             winning_activity.is_winner = True
