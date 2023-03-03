@@ -28,7 +28,7 @@ class EventCreatePermission(BasePermission):
 class ActivityUpdateDestroy(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in ['DELETE', 'PUT', 'PATCH']:
-            return request.user.id == obj.creator.id or request.user.id == obj.event.group.admin.id
+            return request.user == obj.creator or request.user == obj.event.group.admin
 
         return True
 
