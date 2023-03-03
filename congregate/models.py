@@ -66,6 +66,7 @@ class Activity(models.Model):
     location = models.TextField(null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    is_winner = models.BooleanField(default=False)
     attendees = models.ManyToManyField(User, related_name='attending_activities', blank=True)
 
     def __str__(self):

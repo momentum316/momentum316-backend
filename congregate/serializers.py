@@ -48,6 +48,7 @@ class ActivitySerializer(ModelSerializer):
             'end_time',
             'vote_list',
             'total_votes',
+            'is_winner',
             'attendees',
         )
 
