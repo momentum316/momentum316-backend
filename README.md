@@ -12,7 +12,6 @@ Documentation starts here:
 
 | HTTP Verbs | Endpoints                          | Action                                     |
 | ---------- | ---------------------------------- | ------------------------------------------ |
-| POST       | /register                          | Register new user                          |
 | POST       | /login                             | Login or create new user                   |
 | GET        | /\<username\>/home                 | User home page                             |
 | PATCH      | /\<username\>/home                 | User edits own attributes                  |
@@ -21,7 +20,9 @@ Documentation starts here:
 | GET        | /\<username\>/open-votes           | List user's events with open voting        |
 | POST       | /new/group                         | Create a new group                         |
 | GET        | /group/\<group_id\>                | Group home page                            |
-| PATCH      | /group/\<group_id\>                | Edit group home page, add user to group    |
+| PATCH      | /group/\<group_id\>                | Edit group home page                       |
+| PATCH      | /join/\<group_id\>                 | Add user to group                          |
+| PATCH      | /leave/\<group_id\>                | User leaves a group                        |
 | POST       | /new/event                         | Create a new event for the group           |
 | GET        | /event/\<event_id\>                | Event home page                            |
 | PATCH      | /event/\<event_id\>                | Update an event                            |
@@ -36,40 +37,6 @@ Documentation starts here:
 | GET        | /pending/<int:pending_activity_id> | Get pending activity                       |
 | PATCH      | /pending/<int:pending_activity_id> | Update a pending activity                  |
 | DELETE     | /pending/<int:pending_activity_id> | Delete a pending activity                  |
-
-## Register a new user
-
-### request
-
-Username, first name, last name, and email are required.
-
-```txt
-POST /register
-```
-
-```json
-{
-  "username": "bobuser",
-  "first_name": "Bob",
-  "last_name": "User",
-  "email": "fakeemail@gmail.com"
-}
-```
-
-### response
-
-```json
-200 OK
-
-{
-	"id": 6,
-	"username": "bobuser",
-	"first_name": "Bob",
-	"last_name": "User",
-	"email": "fakeemail@gmail.com",
-	"avatar": null
-}
-```
 
 ## Login
 
@@ -412,6 +379,31 @@ PATCH /group/<group_id>/
 }
 ```
 
+## Join a group
+
+### request
+
+Requires authentication as well as username in request
+
+```txt
+PATCH /join/<group_id>
+```
+
+```json
+{
+  "username": "bobuser"
+}
+```
+
+### response
+
+```json
+200 OK
+{
+	"message": "bobuser has joined Mountain Biking Club"
+}
+```
+
 ## Remove user from group
 
 ### request
@@ -433,7 +425,7 @@ PATCH /leave/<group_id>
 ```json
 200 OK
 {
-	"message": "bobuser has left the group"
+	"message": "bobuser has left Mountain Biking Club"
 }
 ```
 
