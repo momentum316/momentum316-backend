@@ -182,6 +182,24 @@ class GroupHome(RetrieveUpdateDestroyAPIView):
         return Response(serializer.data)
 
 
+class AddGroup(UpdateAPIView):
+    serializer_class = GroupSerializer
+    lookup_url_kwarg = 'group_id'
+
+    def get_queryset(self):
+        return Group.objects.filter(id=self.kwargs['group_id'])
+
+    def partial_update(self, request, *args, **kwargs):
+        group = self.get_object()
+        if 'username' in request.data:
+            user = User.objects.get(username=request.data['username'])
+            group.members.add(user)
+        serializer = self.get_serializer(group, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return JsonResponse({'message': f'{user} has joined {group}'}, status=200)
+
+
 class LeaveGroup(UpdateAPIView):
     serializer_class = GroupSerializer
     lookup_url_kwarg = 'group_id'
