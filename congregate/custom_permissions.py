@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from .models import Group, Event
 
 
 class IsGroupMember(BasePermission):
@@ -7,30 +8,43 @@ class IsGroupMember(BasePermission):
             return request.user is obj.admin
 
         return obj in request.user.user_groups.all()
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
-        # if request.method in permissions.SAFE_METHODS:
-        #     return True
-
-        # # Instance must have an attribute named `owner`.
-        # return obj.owner == request.user
 
 
+class IsEventMember(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method == 'DELETE':
+            return request.user is obj.group.admin
 
-# class ReadOnly(BasePermission):
-#     def has_permission(self, request, view):
-#         return request.method in SAFE_METHODS
+        return request.user in obj.group.members.all()
 
-# class ExampleView(APIView):
-#     permission_classes = [IsAuthenticated|ReadOnly]
 
-#     def get(self, request, format=None):
-#         content = {
-#             'status': 'request was permitted'
-#         }
-#         return Response(content)
+class EventCreatePermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            group = Group.objects.get(id=request.data['group_id'])
+            return request.user in group.members.all()
 
-#         def get_object(self):
-#     obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
-#     self.check_object_permissions(self.request, obj)
-#     return obj
+
+class ActivityUpdateDestroy(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in ['DELETE', 'PUT', 'PATCH']:
+            return request.user.id == obj.creator.id or request.user.id == obj.event.group.admin.id
+
+        return True
+
+
+class ActivityCreatePermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            event = Event.objects.get(id=request.data['event_id'])
+            return request.user in event.group.members.all()
+
+
+class PendingActivityPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.creator
+
+
+class VotingPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.voter

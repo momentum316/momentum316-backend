@@ -2,16 +2,17 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+
+from .custom_permissions import IsGroupMember, IsEventMember, EventCreatePermission, ActivityCreatePermission, ActivityUpdateDestroy, PendingActivityPermission, VotingPermission
 from .models import User, Group, Event, Activity, PendingActivity, Vote
 from .serializers import UserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, PendingActivitySerializer, VoteSerializer
+
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
+
 import json
 import random
-
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
-from .custom_permissions import IsGroupMember
 
 # Create your views here.
 
@@ -123,15 +124,12 @@ class UserHome(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    permission_classes = [IsAuthenticated]
-    # need to fix permissions
 
 
 class UserProfile(ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    permission_classes = [IsAuthenticated]
 
 
 class UserOpenVote(ListAPIView):
@@ -139,13 +137,13 @@ class UserOpenVote(ListAPIView):
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.request.user)
+        breakpoint()
         group_ids = user.user_groups.values_list('id', flat=True)
         return Event.objects.filter(group__id__in=group_ids, voting=True, decided=False).exclude(event_voter=user)
 
 
 class CreateGroup(CreateAPIView):
     serializer_class = GroupSerializer
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -205,6 +203,7 @@ class LeaveGroup(UpdateAPIView):
 class EventHome(RetrieveUpdateDestroyAPIView):
     serializer_class = EventSerializer
     lookup_url_kwarg = 'event_id'
+    permission_classes = [IsEventMember]
 
     def get_queryset(self):
         return Event.objects.filter(id=self.kwargs['event_id'])
@@ -236,6 +235,7 @@ def new_event(request):
 
 class CreateEvent(CreateAPIView):
     serializer_class = EventSerializer
+    permission_classes = [EventCreatePermission]
 
     def post(self, request):
         group = Group.objects.get(id=request.data.get('group_id'))
@@ -308,6 +308,7 @@ def new_activity(request):
 
 class CreateActivity(CreateAPIView):
     serializer_class = ActivitySerializer
+    permission_classes = [ActivityCreatePermission]
 
     def post(self, request):
         event = Event.objects.get(id=request.data.get('event_id'))
@@ -326,14 +327,15 @@ class CreateActivity(CreateAPIView):
 class ActivityUpdate(RetrieveUpdateDestroyAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
+    permission_classes = [ActivityUpdateDestroy]
     lookup_url_kwarg = 'activity_id'
 
     def get_queryset(self):
         queryset = Activity.objects.filter(id=self.kwargs['activity_id'])
         return queryset
 
-    def partial_update(self, request):
-        activity = self.get_object()
+    def partial_update(self, request, *args, **kwargs):
+        activity = Activity.objects.get(id=self.kwargs['activity_id'])
         if 'username' in request.data:
             user = User.objects.get(username=request.data['username'])
             activity.attendees.add(user)
@@ -346,6 +348,7 @@ class ActivityUpdate(RetrieveUpdateDestroyAPIView):
 class Voting(RetrieveUpdateAPIView):
     queryset = Vote.objects.all()
     serializer_class = VoteSerializer
+    permission_classes = [VotingPermission]
     lookup_url_kwarg = 'vote_id'
 
     def get_queryset(self):
@@ -399,6 +402,7 @@ class CreatePendingActivity(CreateAPIView):
 class PendingActivityUpdate(RetrieveUpdateDestroyAPIView):
     queryset = PendingActivity.objects.all()
     serializer_class = PendingActivitySerializer
+    permission_classes = [PendingActivityPermission]
     lookup_url_kwarg = 'pending_activity_id'
 
     def get_queryset(self):
