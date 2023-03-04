@@ -195,6 +195,11 @@ class AddGroup(UpdateAPIView):
         if 'username' in request.data:
             user = User.objects.get(username=request.data['username'])
             group.members.add(user)
+
+            activities = Activity.objects.filter(event__group=group)
+            for activity in activities:
+                vote, created = Vote.objects.get_or_create(activity=activity, voter=user)
+
         serializer = self.get_serializer(group, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
