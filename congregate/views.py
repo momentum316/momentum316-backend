@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login
+from django.db.models import Sum
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -398,6 +399,12 @@ def submit_vote(request):
         group = event.group
 
         if group.members.count() <= event.event_voter.count():
+            event_acts = Activity.objects.filter(event=event).annotate(total_votes=Sum('votes__vote')).order_by('-total_votes', '?')
+
+            winning_activity = event_acts[0]
+            winning_activity.is_winner = True
+            winning_activity.save()
+
             event.decided = True
             event.save()
 
