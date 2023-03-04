@@ -349,11 +349,11 @@ class ActivityUpdate(RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = 'activity_id'
 
     def get_queryset(self):
-        queryset = Activity.objects.filter(id=self.kwargs['activity_id'])
-        return queryset
+        return Activity.objects.filter(id=self.kwargs['activity_id'])
 
     def partial_update(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=self.kwargs['activity_id'])
+        self.check_object_permissions(request, activity)
         if 'username' in request.data:
             user = User.objects.get(username=request.data['username'])
             activity.attendees.add(user)
