@@ -54,13 +54,16 @@ class ActivitySerializer(ModelSerializer):
 
 
 class EventSerializer(ModelSerializer):
-    group = SlugRelatedField(slug_field='title', read_only=True)
-    activity_list = SerializerMethodField()
+    activity_list = SerializerMethodField('get_activity_list')
+    group_title = SerializerMethodField('get_group_title')
 
     def get_activity_list(self, obj):
         activities = obj.activities.distinct()
         serializer = ActivitySerializer(instance=activities, many=True)
         return serializer.data
+
+    def get_group_title(self, obj):
+        return obj.group.title
 
     class Meta:
         model = Event
@@ -71,6 +74,7 @@ class EventSerializer(ModelSerializer):
             'date',
             'activity_list',
             'group',
+            'group_title',
             'vote_closing_time',
             'decided',
         )
