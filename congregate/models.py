@@ -43,6 +43,7 @@ class Event(models.Model):
             from .tasks import decide_event
             decide_event_task = decide_event.apply_async(args=[self.id], eta=self.vote_closing_time).id
             self.decide_event_task = decide_event_task
+            self.save()
         else:
             existing_event = Event.objects.get(pk=self.pk)
             if existing_event.vote_closing_time != self.vote_closing_time:
