@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
+from datetime import datetime, timedelta
 
 
 # Create your models here.
@@ -19,9 +20,13 @@ class Group(models.Model):
     title = models.CharField(max_length=255)
     members = models.ManyToManyField(User, related_name='user_groups')
     admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='admin_groups')
+    avatar = models.URLField(max_length=1000, null=True)
 
     def __str__(self):
         return self.title
+
+
+default_vote_closing_time = timezone.now() + timedelta(hours=24)
 
 
 class Event(models.Model):
@@ -29,7 +34,9 @@ class Event(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='events')
     voting = models.BooleanField(default=False)
     date = models.DateTimeField()
-    vote_closing_time = models.DateTimeField(default=timezone.now() + timezone.timedelta(hours=24))
+    description = models.TextField(null=True)
+    location = models.TextField(null=True)
+    vote_closing_time = models.DateTimeField(default=default_vote_closing_time)
     event_voter = models.ManyToManyField(User, related_name='voted_events', blank=True)
     decided = models.BooleanField(default=False)
     decide_event_task = models.CharField(max_length=255, blank=True, null=True)
