@@ -68,9 +68,14 @@ class EventSerializer(ModelSerializer):
     attendees = SlugRelatedField(slug_field='username', many=True, read_only=True)
 
     def get_activity_list(self, obj):
-        activities = obj.activities.distinct()
-        serializer = ActivitySerializer(instance=activities, many=True)
-        return serializer.data
+        if obj.decided:
+            activities = Activity.objects.filter(event=obj).annotate(total_votes=Sum('votes__vote')).order_by('-total_votes', '?')
+            serializer = ActivitySerializer(instance=activities, many=True)
+            return serializer.data
+        else:
+            activities = obj.activities.distinct()
+            serializer = ActivitySerializer(instance=activities, many=True)
+            return serializer.data
 
     def get_group_id(self, obj):
         return obj.group.id
@@ -98,11 +103,13 @@ class EventSerializer(ModelSerializer):
 
 # Is this necessary?
 class DecidedEventSerializer(ModelSerializer):
-    group = SlugRelatedField(slug_field='title', read_only=True)
     activity_list = SerializerMethodField('get_activity_list')
+    group_id = SerializerMethodField('get_group_id')
+    group_title = SerializerMethodField('get_group_title')
+    attendees = SlugRelatedField(slug_field='username', many=True, read_only=True)
 
     def get_activity_list(self, obj):
-        activities = obj.activities.all().order_by('-votes')
+        activities = Activity.objects.filter(event=obj).annotate(total_votes=Sum('votes__vote')).order_by('-total_votes', '?')
         serializer = ActivitySerializer(activities, many=True)
         return serializer.data
 
@@ -114,11 +121,14 @@ class DecidedEventSerializer(ModelSerializer):
             'voting',
             'date',
             'activity_list',
-            'group',
+            'group_id',
+            'group_title',
+            'description',
+            'location',
             'vote_closing_time',
             'decided',
+            'attendees',
         )
-
 
 class GroupSerializer(ModelSerializer):
     members = SlugRelatedField(slug_field='username', many=True, read_only=True)
