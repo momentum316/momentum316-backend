@@ -88,6 +88,8 @@ class EventSerializer(ModelSerializer):
             'activity_list',
             'group_id',
             'group_title',
+            'description',
+            'location',
             'vote_closing_time',
             'decided',
             'attendees',
