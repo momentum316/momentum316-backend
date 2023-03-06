@@ -13,6 +13,7 @@ Documentation starts here:
 | HTTP Verbs | Endpoints                          | Action                                     |
 | ---------- | ---------------------------------- | ------------------------------------------ |
 | POST       | /login                             | Login or create new user                   |
+| POST       | /logout                            | Logout user                                |
 | GET        | /\<username\>/home                 | User home page                             |
 | PATCH      | /\<username\>/home                 | User edits own attributes                  |
 | GET        | /\<username\>/profile              | View another user's profile                |
@@ -72,6 +73,26 @@ POST /login
 		"avatar": null
 	},
 	"token": "y22833c083d494b7c2683f53457376d7d8379a40"
+}
+```
+
+## Logout
+
+### request
+
+Requires authentication
+
+```txt
+POST /logout
+```
+
+### response
+
+```json
+200 OK
+
+{
+	"message": "Logout successful"
 }
 ```
 
