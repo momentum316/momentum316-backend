@@ -86,41 +86,6 @@ def GoogleLogin(request):
         response_data['token'] = token.key
         return JsonResponse(response_data)
 
-'''
-no longer need, will wait for any bug reports from front end
-'''
-@csrf_exempt
-def new_user(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('username', None)
-        first_name = data.get('first_name', None)
-        last_name = data.get('last_name', None)
-        email = data.get('email', None)
-
-        # Validate required fields are present
-        if not all([first_name, last_name, email]):
-            return JsonResponse({'error': 'username, first_name, last_name, and email are required fields'}, status=400)
-
-        # Authenticate user with email
-        user = authenticate(request, email=email)
-        if user is not None:
-            login(request, user)
-            return redirect(f'/{user.username}/home/', status=302)
-
-        # Check if the user already exists
-        if User.objects.filter(username=username).exists():
-            return JsonResponse({'error': 'user with this username already exists'}, status=409)
-
-        # Create and save the new user
-        user = User.objects.create(username=email, first_name=first_name, last_name=last_name, email=email)
-        user.save()
-
-        return redirect(f'/{user.email}/home/', status=201)
-
-    else:
-        return JsonResponse({'error': 'invalid request method'}, status=405)
-
 
 class UserHome(RetrieveUpdateAPIView):
     queryset = User.objects.all()
@@ -176,16 +141,6 @@ class GroupHome(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Group.objects.filter(id=self.kwargs['group_id'])
-
-    # def partial_update(self, request, *args, **kwargs):
-    #     group = self.get_object()
-    #     if 'username' in request.data:
-    #         user = User.objects.get(username=request.data['username'])
-    #         group.members.add(user)
-    #     serializer = self.get_serializer(group, data=request.data, partial=True)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_update(serializer)
-    #     return Response(serializer.data)
 
 
 class AddGroup(UpdateAPIView):
@@ -278,30 +233,6 @@ class RemoveAttendEvent(UpdateAPIView):
         return JsonResponse({'message': f'{user} is no longer attending this event'}, status=200)
 
 
-'''
-no longer needed, will wait for any bug reports from front end
-'''
-@csrf_exempt
-def new_event(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        title = data.get('title', None)
-        group_id = data.get('group_id', None)
-        voting = data.get('voting', None)
-        date = data.get('date', None)
-        vote_closing_time = data.get('vote_closing_time', None)
-
-        # Create and save the new event
-        group = Group.objects.get(id=group_id)
-        event = Event.objects.create(title=title, group=group, voting=voting, date=date, vote_closing_time=vote_closing_time)
-        event.save()
-
-        return JsonResponse({'event': {'id': event.id, 'title': event.title, 'voting': event.voting, 'date': event.date, 'vote_closing_time': event.vote_closing_time}}, status=201)
-
-    else:
-        return JsonResponse({'error': 'invalid request method'}, status=405)
-
-
 class CreateEvent(CreateAPIView):
     serializer_class = EventSerializer
     permission_classes = [EventCreatePermission]
@@ -312,67 +243,6 @@ class CreateEvent(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save(group=group)
         return Response(serializer.data, status=201)
-
-
-'''
-no longer needed, will wait for any bug reports from front end
-'''
-def add_user_group(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('username', None)
-        group_id = data.get('group_id', None)
-
-        # Look up user and group
-        user = User.objects.get(username=username)
-        group = Group.objects.get(id=group_id)
-
-        # Check if user is already a member of the group
-        if user in group.members.all():
-            return JsonResponse({'error': f'{username} is already a member of the group'}, status=409)
-
-        # Need to add these
-        # If user not found...
-        # If group does not exists, throw 404
-
-        # Add user to group members list
-        group.members.add(user)
-
-        return redirect(f'/group/{group_id}', status=201)
-
-    else:
-        return JsonResponse({'error': 'invalid request method'}, status=405)
-
-
-'''
-no longer needed, will wait for any bug reports from front end
-'''
-@csrf_exempt
-def new_activity(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        title = data.get('title', None)
-        event_id = data.get('event_id', None)
-        username = data.get('username', None)
-        description = data.get('description', None)
-        start_time = data.get('start_time', None)
-        end_time = data.get('end_time', None)
-
-        # Create and save the new event
-        creator = User.objects.get(username=username)
-        event = Event.objects.get(id=event_id)
-        activity = Activity.objects.create(title=title, event=event, creator=creator, description=description, start_time=start_time, end_time=end_time)
-        activity.save()
-
-        group = event.group
-        for member in group.members.all():
-            vote = Vote.objects.create(voter=member, activity=activity)
-            vote.save()
-
-        return JsonResponse({'activity': {'id': activity.id, 'title': activity.title, 'description': activity.description, 'start_time': activity.start_time, 'end_time': activity.end_time}}, status=201)
-
-    else:
-        return JsonResponse({'error': 'invalid request method'}, status=405)
 
 
 class CreateActivity(CreateAPIView):
@@ -401,17 +271,6 @@ class ActivityUpdate(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Activity.objects.filter(id=self.kwargs['activity_id'])
-
-    # def partial_update(self, request, *args, **kwargs):
-    #     activity = Activity.objects.get(id=self.kwargs['activity_id'])
-    #     self.check_object_permissions(request, activity)
-    #     if 'username' in request.data:
-    #         user = User.objects.get(username=request.data['username'])
-    #         activity.attendees.add(user)
-    #     serializer = self.get_serializer(activity, data=request.data, partial=True)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_update(serializer)
-    #     return Response(serializer.data)
 
 
 class Voting(RetrieveUpdateAPIView):
