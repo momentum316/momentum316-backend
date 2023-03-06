@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from .models import Group, Event
+from .models import Group, Event, Activity
 
 
 class IsGroupMember(BasePermission):
@@ -48,3 +48,24 @@ class PendingActivityPermission(BasePermission):
 class VotingPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user == obj.voter
+
+
+class UploadCreatePermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            if 'group_id' in request.data:
+                group = Group.objects.get(id=request.data['group_id'])
+                if 'activity_id' in request.data:
+                    activity = Activity.objects.get(id=request.data['activity_id'])
+                    return request.user == activity.creator or request.user == group.admin
+                return request.user in group.members.all()
+
+            return True
+
+
+class UploadPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if obj.group:
+            return request.user == obj.owner or request.user == obj.group.admin
+
+        return request.user == obj.owner
