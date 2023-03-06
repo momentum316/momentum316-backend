@@ -131,6 +131,7 @@ class GroupSerializer(ModelSerializer):
         fields = (
             'id',
             'title',
+            'avatar',
             'members',
             'admin',
             'event_list',
