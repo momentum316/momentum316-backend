@@ -3,7 +3,6 @@ from . import views
 
 urlpatterns = [
     path('login', views.GoogleLogin, name='login'),
-    path('register', views.new_user, name='registration'),
     path('<username>/home/', views.UserHome.as_view(), name='home'),
     path('<username>/profile/', views.UserProfile.as_view(), name='profile'),
     path('<username>/groups/', views.UserGroup.as_view(), name='user_groups'),
