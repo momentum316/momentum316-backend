@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
@@ -10,6 +10,7 @@ from .serializers import UserSerializer, GroupSerializer, EventSerializer, Activ
 
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 
@@ -85,6 +86,16 @@ def GoogleLogin(request):
         }
         response_data['token'] = token.key
         return JsonResponse(response_data)
+
+
+class LogoutView(APIView):
+    def post(self, request):
+        if request.user.is_authenticated:
+            request.user.auth_token.delete()
+            logout(request)
+            return Response({"message": "Logout successful"})
+        else:
+            return Response({"message": "User is not logged in"})
 
 
 class UserHome(RetrieveUpdateAPIView):
