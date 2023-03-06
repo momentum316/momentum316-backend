@@ -4,12 +4,12 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
-from .custom_permissions import IsGroupMember, IsEventMember, EventCreatePermission, ActivityCreatePermission, ActivityUpdateDestroy, PendingActivityPermission, VotingPermission, UploadCreatePermission, UploadPermission
+from .custom_permissions import IsUser, IsGroupMember, IsEventMember, EventCreatePermission, ActivityCreatePermission, ActivityUpdateDestroy, PendingActivityPermission, VotingPermission, UploadCreatePermission, UploadPermission
 from .models import User, Group, Event, Activity, PendingActivity, Vote, Upload
 from .serializers import UserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, PendingActivitySerializer, VoteSerializer, UploadSerializer
 
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 
@@ -126,12 +126,17 @@ class UserHome(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
+    permission_classes = [IsUser]
 
 
-class UserProfile(ListAPIView):
+class UserProfile(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
+
+    # def get_queryset(self):
+    #     user = get_object_or_404(User, username=self.kwargs['username'])
+    #     return user
 
 
 class UserOpenVote(ListAPIView):
@@ -172,15 +177,15 @@ class GroupHome(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Group.objects.filter(id=self.kwargs['group_id'])
 
-    def partial_update(self, request, *args, **kwargs):
-        group = self.get_object()
-        if 'username' in request.data:
-            user = User.objects.get(username=request.data['username'])
-            group.members.add(user)
-        serializer = self.get_serializer(group, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+    # def partial_update(self, request, *args, **kwargs):
+    #     group = self.get_object()
+    #     if 'username' in request.data:
+    #         user = User.objects.get(username=request.data['username'])
+    #         group.members.add(user)
+    #     serializer = self.get_serializer(group, data=request.data, partial=True)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_update(serializer)
+    #     return Response(serializer.data)
 
 
 class AddGroup(UpdateAPIView):
@@ -231,6 +236,46 @@ class EventHome(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Event.objects.filter(id=self.kwargs['event_id'])
+
+
+class AttendEvent(UpdateAPIView):
+    serializer_class = EventSerializer
+    lookup_url_kwarg = 'event_id'
+    permission_classes = [IsEventMember]
+
+    def get_queryset(self):
+        return Event.objects.filter(id=self.kwargs['event_id'])
+
+    def partial_update(self, request, *args, **kwargs):
+        event = self.get_object()
+        self.check_object_permissions(request, event)
+        if 'username' in request.data:
+            user = User.objects.get(username=request.data['username'])
+            event.attendees.add(user)
+        serializer = self.get_serializer(event, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return JsonResponse({'message': f'{user} is attending this event'}, status=200)
+
+
+class RemoveAttendEvent(UpdateAPIView):
+    serializer_class = EventSerializer
+    lookup_url_kwarg = 'event_id'
+    permission_classes = [IsEventMember]
+
+    def get_queryset(self):
+        return Event.objects.filter(id=self.kwargs['event_id'])
+
+    def partial_update(self, request, *args, **kwargs):
+        event = self.get_object()
+        self.check_object_permissions(request, event)
+        if 'username' in request.data:
+            user = User.objects.get(username=request.data['username'])
+            event.attendees.remove(user)
+        serializer = self.get_serializer(event, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return JsonResponse({'message': f'{user} is no longer attending this event'}, status=200)
 
 
 '''
@@ -357,16 +402,16 @@ class ActivityUpdate(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Activity.objects.filter(id=self.kwargs['activity_id'])
 
-    def partial_update(self, request, *args, **kwargs):
-        activity = Activity.objects.get(id=self.kwargs['activity_id'])
-        self.check_object_permissions(request, activity)
-        if 'username' in request.data:
-            user = User.objects.get(username=request.data['username'])
-            activity.attendees.add(user)
-        serializer = self.get_serializer(activity, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+    # def partial_update(self, request, *args, **kwargs):
+    #     activity = Activity.objects.get(id=self.kwargs['activity_id'])
+    #     self.check_object_permissions(request, activity)
+    #     if 'username' in request.data:
+    #         user = User.objects.get(username=request.data['username'])
+    #         activity.attendees.add(user)
+    #     serializer = self.get_serializer(activity, data=request.data, partial=True)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_update(serializer)
+    #     return Response(serializer.data)
 
 
 class Voting(RetrieveUpdateAPIView):

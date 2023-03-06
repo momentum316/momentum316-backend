@@ -38,7 +38,6 @@ class ActivitySerializer(ModelSerializer):
     creator = SlugRelatedField(slug_field='username', read_only=True)
     vote_list = VoteSerializer(many=True, source='votes', read_only=True)
     total_votes = SerializerMethodField('get_votes_tally')
-    attendees = SlugRelatedField(slug_field='username', many=True, read_only=True)
     upload_list = UploadSerializer(many=True, source='uploads')
 
     def get_votes_tally(self, obj):
@@ -58,7 +57,6 @@ class ActivitySerializer(ModelSerializer):
             'vote_list',
             'total_votes',
             'is_winner',
-            'attendees',
             'upload_list',
         )
 
@@ -66,6 +64,7 @@ class ActivitySerializer(ModelSerializer):
 class EventSerializer(ModelSerializer):
     activity_list = SerializerMethodField('get_activity_list')
     group_title = SerializerMethodField('get_group_title')
+    attendees = SlugRelatedField(slug_field='username', many=True, read_only=True)
 
     def get_activity_list(self, obj):
         activities = obj.activities.distinct()
@@ -87,6 +86,7 @@ class EventSerializer(ModelSerializer):
             'group_title',
             'vote_closing_time',
             'decided',
+            'attendees',
         )
 
 
@@ -135,6 +135,7 @@ class GroupSerializer(ModelSerializer):
 class UserSerializer(ModelSerializer):
     group_list = GroupSerializer(many=True, source='user_groups', read_only=True)
     pending_activities = SlugRelatedField(slug_field='title', many=True, read_only=True)
+    attending_list = EventSerializer(many=True, source='attending_events', read_only=True)
     upload_list = UploadSerializer(many=True, source='uploads')
 
     class Meta:
@@ -147,6 +148,7 @@ class UserSerializer(ModelSerializer):
             'email',
             'avatarURL',
             'pending_activities',
+            'attending_list',
             'group_list',
             'upload_list',
         )

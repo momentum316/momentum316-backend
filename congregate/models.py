@@ -33,6 +33,7 @@ class Event(models.Model):
     event_voter = models.ManyToManyField(User, related_name='voted_events', blank=True)
     decided = models.BooleanField(default=False)
     decide_event_task = models.CharField(max_length=255, blank=True, null=True)
+    attendees = models.ManyToManyField(User, related_name='attending_events', blank=True)
 
     def __str__(self):
         return self.title
@@ -68,7 +69,6 @@ class Activity(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     is_winner = models.BooleanField(default=False)
-    attendees = models.ManyToManyField(User, related_name='attending_activities', blank=True)
 
     def __str__(self):
         return self.title
