@@ -97,8 +97,10 @@ class Vote(models.Model):
 
 
 class Upload(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploads')
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='uploads')
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='uploads')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploads')
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='uploads', null=True, blank=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='uploads', null=True, blank=True)
     file = models.FileField(upload_to='media/', blank=True, null=True)
     image = models.ImageField(upload_to='media/', blank=True, null=True)
+    description = models.TextField(null=True)
+    created = models.DateTimeField(auto_now_add=True)

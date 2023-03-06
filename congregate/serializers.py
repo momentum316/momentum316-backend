@@ -1,6 +1,14 @@
 from django.db.models import Sum
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, SlugRelatedField
-from .models import User, Group, Event, Activity, PendingActivity, Vote
+from .models import User, Group, Event, Activity, PendingActivity, Vote, Upload
+
+
+class UploadSerializer(ModelSerializer):
+    owner = SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Upload
+        fields = '__all__'
 
 
 class VoteSerializer(ModelSerializer):
@@ -31,6 +39,7 @@ class ActivitySerializer(ModelSerializer):
     vote_list = VoteSerializer(many=True, source='votes', read_only=True)
     total_votes = SerializerMethodField('get_votes_tally')
     attendees = SlugRelatedField(slug_field='username', many=True, read_only=True)
+    upload_list = UploadSerializer(many=True, source='uploads')
 
     def get_votes_tally(self, obj):
         return obj.votes.aggregate(total_votes=Sum('vote'))['total_votes']
@@ -50,6 +59,7 @@ class ActivitySerializer(ModelSerializer):
             'total_votes',
             'is_winner',
             'attendees',
+            'upload_list',
         )
 
 
@@ -108,6 +118,7 @@ class GroupSerializer(ModelSerializer):
     members = SlugRelatedField(slug_field='username', many=True, read_only=True)
     admin = SlugRelatedField(slug_field='username', read_only=True)
     event_list = EventSerializer(many=True, source='events', read_only=True)
+    upload_list = UploadSerializer(many=True, source='uploads')
 
     class Meta:
         model = Group
@@ -117,12 +128,14 @@ class GroupSerializer(ModelSerializer):
             'members',
             'admin',
             'event_list',
+            'upload_list',
         )
 
 
 class UserSerializer(ModelSerializer):
     group_list = GroupSerializer(many=True, source='user_groups', read_only=True)
     pending_activities = SlugRelatedField(slug_field='title', many=True, read_only=True)
+    upload_list = UploadSerializer(many=True, source='uploads')
 
     class Meta:
         model = User
@@ -135,4 +148,5 @@ class UserSerializer(ModelSerializer):
             'avatarURL',
             'pending_activities',
             'group_list',
+            'upload_list',
         )

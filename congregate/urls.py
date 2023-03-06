@@ -20,4 +20,6 @@ urlpatterns = [
     path('submit-vote/', views.submit_vote, name='submit_vote'),
     path('new/pending-activity/', views.CreatePendingActivity.as_view(), name='new_pending_activity'),
     path('pending/<int:pending_activity_id>', views.PendingActivityUpdate.as_view(), name='pending_activity_update'),
+    path('new/upload/', views.CreateUpload.as_view(), name='new_upload'),
+    path('upload/<int:upload_id>', views.UploadView.as_view(), name='upload_view'),
 ]

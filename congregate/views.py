@@ -4,13 +4,14 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
-from .custom_permissions import IsGroupMember, IsEventMember, EventCreatePermission, ActivityCreatePermission, ActivityUpdateDestroy, PendingActivityPermission, VotingPermission
-from .models import User, Group, Event, Activity, PendingActivity, Vote
-from .serializers import UserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, PendingActivitySerializer, VoteSerializer
+from .custom_permissions import IsGroupMember, IsEventMember, EventCreatePermission, ActivityCreatePermission, ActivityUpdateDestroy, PendingActivityPermission, VotingPermission, UploadCreatePermission, UploadPermission
+from .models import User, Group, Event, Activity, PendingActivity, Vote, Upload
+from .serializers import UserSerializer, GroupSerializer, EventSerializer, ActivitySerializer, PendingActivitySerializer, VoteSerializer, UploadSerializer
 
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser
 
 import json
 import random
@@ -138,7 +139,6 @@ class UserOpenVote(ListAPIView):
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.request.user)
-        breakpoint()
         group_ids = user.user_groups.values_list('id', flat=True)
         return Event.objects.filter(group__id__in=group_ids, voting=True, decided=False).exclude(event_voter=user)
 
@@ -438,3 +438,48 @@ class PendingActivityUpdate(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         queryset = PendingActivity.objects.filter(id=self.kwargs['pending_activity_id'])
         return queryset
+
+
+class CreateUpload(CreateAPIView):
+    serializer_class = UploadSerializer
+    parser_classes = [MultiPartParser]
+    permission_classes = [UploadCreatePermission]
+
+    def post(self, request):
+        if 'group_id' in request.data:
+            group = Group.objects.get(id=request.data.get('group_id'))
+        if 'activity_id' in request.data:
+            activity = Activity.objects.get(id=request.data.get('activity_id'))
+        if 'description' in request.data:
+            description = request.POST.get('description')
+        images = request.FILES.getlist('image')
+        files = request.FILES.getlist('file')
+
+        for image in images:
+            pic = Upload(owner=self.request.user, image=image)
+            if activity:
+                pic.activity = activity
+            if group:
+                pic.group = group
+            if description:
+                pic.description = description
+            pic.save()
+        for fil3 in files:
+            obj = Upload(owner=self.request.user, file=fil3)
+            if activity:
+                obj.activity = activity
+            if group:
+                obj.group = group
+            if description:
+                obj.description = description
+            obj.save()
+        return JsonResponse({'message': 'Upload successful'}, status=201)
+
+
+class UploadView(RetrieveUpdateDestroyAPIView):
+    serializer_class = UploadSerializer
+    lookup_url_kwarg = 'upload_id'
+    permission_classes = [UploadPermission]
+
+    def get_queryset(self):
+        return Upload.objects.filter(id=self.kwargs['upload_id'])
