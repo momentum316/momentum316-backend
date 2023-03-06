@@ -27,6 +27,8 @@ Documentation starts here:
 | GET        | /event/\<event_id\>                | Event home page                            |
 | PATCH      | /event/\<event_id\>                | Update an event                            |
 | DELETE     | /event/\<event_id\>                | Delete an event                            |
+| PATCH      | /attend/\<event_id\>               | User adds to attending list                |
+| PATCH      | /remove-attend/\<event_id\>        | User removes from attending list           |
 | POST       | /new/activity                      | Create a new activity for the event        |
 | GET        | /activity/\<activity_id\>          | Activity home page                         |
 | PATCH      | /activity/\<activity_id\>          | Update an activity                         |
@@ -542,6 +544,54 @@ DELETE /event/<event_id>/
 
 ```json
 204 No Content
+```
+
+## User adds to attending list
+
+### request
+
+Requires authentication
+
+```txt
+PATCH /attend/<event_id>
+```
+
+```json
+{
+  "username": "jcox"
+}
+```
+
+### response
+
+```json
+{
+  "message": "jcox is attending this event"
+}
+```
+
+## User removes from attending list
+
+### request
+
+Requires authentication
+
+```txt
+PATCH /remove-attend/<event_id>
+```
+
+```json
+{
+  "username": "jcox"
+}
+```
+
+### response
+
+```json
+{
+  "message": "jcox is no longer attending this event"
+}
 ```
 
 ## Create a new activity for the event

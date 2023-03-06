@@ -2,12 +2,17 @@ from rest_framework.permissions import BasePermission
 from .models import Group, Event, Activity
 
 
+class IsUser(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj
+
+
 class IsGroupMember(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method == 'DELETE':
             return request.user is obj.admin
 
-        return obj in request.user.user_groups.all()
+        return request.user in obj.members.all()
 
 
 class IsEventMember(BasePermission):
@@ -30,7 +35,7 @@ class ActivityUpdateDestroy(BasePermission):
         if request.method in ['DELETE', 'PUT', 'PATCH']:
             return request.user == obj.creator or request.user == obj.event.group.admin
 
-        return True
+        return request.user in obj.event.group.members.all()
 
 
 class ActivityCreatePermission(BasePermission):
