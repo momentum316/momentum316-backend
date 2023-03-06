@@ -63,6 +63,7 @@ class ActivitySerializer(ModelSerializer):
 
 class EventSerializer(ModelSerializer):
     activity_list = SerializerMethodField('get_activity_list')
+    group_id = SerializerMethodField('get_group_id')
     group_title = SerializerMethodField('get_group_title')
     attendees = SlugRelatedField(slug_field='username', many=True, read_only=True)
 
@@ -70,6 +71,9 @@ class EventSerializer(ModelSerializer):
         activities = obj.activities.distinct()
         serializer = ActivitySerializer(instance=activities, many=True)
         return serializer.data
+
+    def get_group_id(self, obj):
+        return obj.group.id
 
     def get_group_title(self, obj):
         return obj.group.title
@@ -82,7 +86,7 @@ class EventSerializer(ModelSerializer):
             'voting',
             'date',
             'activity_list',
-            'group',
+            'group_id',
             'group_title',
             'vote_closing_time',
             'decided',
