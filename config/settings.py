@@ -157,17 +157,6 @@ AUTH_USER_MODEL = 'congregate.User'
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-if env('RENDER'):
-    ALLOWED_HOSTS.append(env('RENDER_EXTERNAL_HOSTNAME'))
-    DJANGO_SUPERUSER_USERNAME = env('DJANGO_SUPERUSER_USERNAME')
-    DJANGO_SUPERUSER_PASSWORD = env('DJANGO_SUPERUSER_PASSWORD')
-    DJANGO_SUPERUSER_EMAIL = env('DJANGO_SUPERUSER_EMAIL')
-    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
-    GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
-    GOOGLE_SECRET_KEY = env('GOOGLE_SECRET_KEY')
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -204,34 +193,6 @@ del DATABASES['default']['OPTIONS']['sslmode']
 
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
 GOOGLE_SECRET_KEY = env('GOOGLE_SECRET_KEY')
-
-ACCOUNT_LOGOUT_ON_GET = True
-ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_SESSION_REMEMBER = None
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_USERNAME_MIN_LENGTH = 4
-SOCIALACCOUNT_AUTO_SIGNUP = False
-SOCIALACCOUNT_QUERY_EMAIL = True
-
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': env('GOOGLE_CLIENT_ID'),
-            'secret': env('GOOGLE_SECRET_KEY'),
-            'key': '',
-        },
-        'SCOPE': [
-            'profile',
-            'email',
-            'https://www.googleapis.com/auth/calendar',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'offline',
-        },
-        'OAUTH_PKCE_ENABLED': True,
-    }
-}
 
 DEFAULT_FROM_EMAIL = 'momentumlearn316@gmail.com'
 
