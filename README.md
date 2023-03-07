@@ -1,10 +1,10 @@
 # Congregate Server Side API
 
-This application is an API built with Django REST Framework (DRF) that lets users join groups of users who can vote on event activities that for the group. When the voting time expires, the winning activity is assigned to the event and a google calendar invitation is sent to each user of the group.
+This application is an API built with Django REST Framework (DRF) that lets users join groups of users who can vote on event activities that for the group. When the voting time expires, the winning activity is assigned to the event, and if a user accepts the event, the app places the event and its details on the uses Google Calendar.
 
 # Link to Production Application
 
-https://congregate.onrender.com
+http://congregate.herokuapp.com/
 
 Documentation starts here:
 
