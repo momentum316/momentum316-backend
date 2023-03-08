@@ -250,9 +250,13 @@ class CreateEvent(CreateAPIView):
 
     def post(self, request):
         group = Group.objects.get(id=request.data.get('group_id'))
+        voting = request.data['voting']
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(group=group)
+        if not voting:
+            serializer.save(group=group, decided=True)
+        else:
+            serializer.save(group=group)
         return Response(serializer.data, status=201)
 
 
