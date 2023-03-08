@@ -66,7 +66,7 @@ class EventSerializer(ModelSerializer):
     group_id = SerializerMethodField('get_group_id')
     group_title = SerializerMethodField('get_group_title')
     group_avatar = SerializerMethodField('get_group_avatar')
-    attendees = SlugRelatedField(slug_field='username', many=True, read_only=True)
+    event_voter = SlugRelatedField(slug_field='username', many=True, read_only=True)
 
     def get_activity_list(self, obj):
         if obj.decided:
@@ -102,7 +102,7 @@ class EventSerializer(ModelSerializer):
             'location',
             'vote_closing_time',
             'decided',
-            'attendees',
+            'event_voter',
         )
 
 
