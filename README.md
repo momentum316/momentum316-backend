@@ -4,7 +4,7 @@ This application is an API built with Django REST Framework (DRF) that lets user
 
 # Link to Production Application
 
-http://congregate.herokuapp.com/
+https://main--fanciful-pothos-f7e454.netlify.app/
 
 Documentation starts here:
 
