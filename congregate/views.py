@@ -17,8 +17,6 @@ from rest_framework.parsers import MultiPartParser
 import json
 import random
 
-# Create your views here.
-
 
 @csrf_exempt
 def GoogleLogin(request):
